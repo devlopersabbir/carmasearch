@@ -36,3 +36,5 @@ keys/*
 __debug*
 
 build
+.env
+.env.production
