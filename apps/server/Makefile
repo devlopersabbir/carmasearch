@@ -13,11 +13,15 @@ help: ## Show this help message
 
 run: ## Run the application
 	@echo "Starting server..."
-	go run cmd/api/main.go
+	go run ./cmd/main.go
+
+start-prod:
+	@echo "Starting server..."
+	./bin/$(BINARY_NAME)
 
 build: ## Build the application
 	@echo "Building..."
-	go build -o bin/$(BINARY_NAME) cmd/api/main.go
+	go build -o bin/$(BINARY_NAME) ./cmd/main.go
 
 test: ## Run tests
 	@echo "Running tests..."

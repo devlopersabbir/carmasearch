@@ -3,27 +3,31 @@ FROM golang:1.24-alpine AS builder
 
 WORKDIR /app
 
-# Cache deps
-COPY go.mod go.sum ./
-RUN go mod download
+RUN apk add --no-cache \
+    build-base \
+    postgresql-dev \
+    python3-dev \
+    make
 
-# Copy source
 COPY . .
+RUN make deps && make build
 
-# Build (note cmd/main.go)
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
     go build -o server ./cmd/main.go
 
-# ---- Runtime stage ----
 FROM alpine:latest
 
 WORKDIR /app
 
-# CA certs (important for HTTPS, DB, APIs)
 RUN apk add --no-cache ca-certificates
+RUN apk add --no-cache \
+    build-base \
+    postgresql-dev \
+    python3-dev \
+    make
 
-COPY --from=builder /app/server .
+COPY --from=builder /app/bin/carma-server .
 
 EXPOSE 8080
-CMD ["./server"]
+CMD ["make", "start-prod"]
 
