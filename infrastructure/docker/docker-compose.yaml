@@ -1,4 +1,66 @@
 services:
+  web:
+    container_name: carma-web
+    image: devlopersabbir/carmasearch-web:latest
+    platform: linux/amd64
+    profiles:
+      - prod
+    build:
+      context: ../../apps/web
+      dockerfile: Dockerfile.web
+    ports:
+      - "3000:3000"
+    env_file:
+      - ../../apps/web/.env
+    depends_on:
+      - server
+    networks:
+      - carmasearch
+
+  server:
+    image: devlopersabbir/carmasearch-server:latest
+    platform: linux/amd64
+    container_name: carma-server
+    profiles:
+      - prod
+    build:
+      context: ../../apps/server
+      dockerfile: Dockerfile.server
+    ports:
+      - "8080:8080"
+    env_file:
+      - ../../apps/server/.env
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      scraper:
+        condition: service_started
+    networks:
+      - carmasearch
+
+  scraper:
+    image: devlopersabbir/carmasearch-scraper:latest
+    platform: linux/amd64
+    container_name: carma-scraper
+    profiles:
+      - prod
+    build:
+      context: ../../apps/scraper
+      dockerfile: Dockerfile.scraper
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    ports:
+      - "8000:8000"
+    env_file:
+      - ../../apps/scraper/.env
+    networks:
+      - carmasearch
+
   db:
     image: postgres:16-alpine
     container_name: carma_db
@@ -39,29 +101,10 @@ services:
       - carmasearch
     restart: unless-stopped
 
-  # Optional: your Go API service
-  app:
-    build: .
-    container_name: carma-server
-    profiles:
-      - prod
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_started
-    env_file:
-      - ../../.env
-    ports:
-      - "8080:8080"
-    networks:
-      - carmasearch
-    restart: unless-stopped
+networks:
+  carmasearch:
+    driver: bridge
 
 volumes:
   postgres_data:
     driver: local
-
-networks:
-  carmasearch:
-    driver: bridge
