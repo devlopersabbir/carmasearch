@@ -1,26 +1,8 @@
 services:
-  web:
-    container_name: carma-web
-    image: devlopersabbir/carmasearch-web:latest
-    platform: linux/amd64
-    profiles:
-      - prod
-    build:
-      context: ../../apps/web
-      dockerfile: Dockerfile.web
-    ports:
-      - "3000:3000"
-    env_file:
-      - ../../apps/web/.env
-    depends_on:
-      - server
-    networks:
-      - carmasearch
-
   server:
     image: devlopersabbir/carmasearch-server:latest
-    platform: linux/amd64
     container_name: carma-server
+    platform: linux/amd64
     profiles:
       - prod
     build:
@@ -30,13 +12,11 @@ services:
       - "8080:8080"
     env_file:
       - ../../apps/server/.env
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_started
-      scraper:
-        condition: service_started
+    # depends_on:
+    #   db:
+    #     condition: service_healthy
+    #   redis:
+    #     condition: service_started
     networks:
       - carmasearch
 
@@ -58,6 +38,22 @@ services:
       - "8000:8000"
     env_file:
       - ../../apps/scraper/.env
+    networks:
+      - carmasearch
+
+  web:
+    container_name: carma-web
+    image: devlopersabbir/carmasearch-web:latest
+    platform: linux/amd64
+    profiles:
+      - prod
+    build:
+      context: ../../apps/web
+      dockerfile: Dockerfile.web
+    ports:
+      - "3000:3000"
+    env_file:
+      - ../../apps/web/.env
     networks:
       - carmasearch
 
@@ -88,7 +84,6 @@ services:
     networks:
       - carmasearch
     restart: unless-stopped
-
   redis:
     image: redis:alpine
     container_name: redis

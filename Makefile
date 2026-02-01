@@ -1,5 +1,11 @@
-docker-up:
+docker-build:
 	docker compose -f infrastructure/docker/docker-compose.yaml --profile prod up --build
+
+docker-up:
+	docker compose -f infrastructure/docker/docker-compose.yaml --profile prod up -d
+
+docker-push:
+	docker compose -f infrastructure/docker/docker-compose.yaml --profile prod push
 
 docker-down:
 	docker compose -f infrastructure/docker/docker-compose.yaml --profile prod down
