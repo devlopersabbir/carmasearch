@@ -1,7 +1,12 @@
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
+from routers.scrape import router as scrape_router
 
-app = FastAPI(title="CarMasearch Scraper API", version="1.0.0", description="CarMasearch Scraper API")
+app = FastAPI(
+    title="CarMasearch Scraper API",
+    version="1.0.0",
+    description="CarMasearch Scraper API"
+)
 
 @app.get("/")
 async def root():
@@ -9,3 +14,5 @@ async def root():
         "status": "Running..."
     }
     return JSONResponse(content=res, status_code=200)
+
+app.include_router(scrape_router)
