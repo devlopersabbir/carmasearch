@@ -35,6 +35,7 @@ carma-backend/
 ## Getting Started
 
 ### Prerequisites
+
 - Go 1.21+
 - PostgreSQL 15+
 - Redis 7+ (optional for Phase 1)
@@ -90,4 +91,3 @@ See `.env.example` for all configuration options.
 3. **API-First** - REST with OpenAPI/Swagger documentation
 4. **Database Migrations** - Version-controlled schema changes
 5. **Observability** - Structured logging, metrics, tracing ready
-

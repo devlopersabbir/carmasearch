@@ -12,11 +12,6 @@ services:
       - "8080:8080"
     env_file:
       - ../../apps/server/.env
-    # depends_on:
-    #   db:
-    #     condition: service_healthy
-    #   redis:
-    #     condition: service_started
     networks:
       - carmasearch
 
