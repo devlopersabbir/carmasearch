@@ -7,8 +7,6 @@ import (
 	"time"
 )
 
-// =============== HELPER FUNCTIONS =============== //
-
 // GetEnv returns the value of the environment variable with the given key.
 // If the environment variable is not set, it returns the default value.
 func GetEnv(key string, defaultValue string) string {

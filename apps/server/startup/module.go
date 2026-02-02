@@ -2,8 +2,10 @@ package startup
 
 import (
 	"context"
+	"time"
 
 	"github.com/carmasearch/carma-server/api/health"
+	"github.com/carmasearch/carma-server/api/root"
 	coreMW "github.com/carmasearch/carma-server/arch/middleware"
 	"github.com/carmasearch/carma-server/arch/network"
 	"github.com/carmasearch/carma-server/arch/redis"
@@ -15,7 +17,9 @@ type Module network.Module[module]
 
 type module struct {
 	Context       context.Context
+	RootService   root.Service
 	HealthService health.Service
+	// List of service is here
 	// UserService
 	// AuthService and rest...
 }
@@ -27,6 +31,8 @@ func (m *module) GetInstance() *module {
 func (m *module) Controllers() []network.Controller {
 	return []network.Controller{
 		health.NewController(m.AuthenticationProvider(), m.AuthorizationProvider(), m.HealthService),
+		root.NewController(m.AuthenticationProvider(), m.AuthorizationProvider(), m.RootService),
+		// list of controller register will be here...
 	}
 }
 
@@ -48,7 +54,8 @@ func (m *module) AuthorizationProvider() network.AuthorizationProvider {
 func NewModule(ctx context.Context, env *config.Config, db *gorm.DB, store redis.Store) Module {
 	return &module{
 		Context:       ctx,
-		HealthService: health.NewService(),
+		RootService:   root.NewService(),
+		HealthService: health.NewService(env.Server.Environment, time.Now()),
 		// userservice
 		// auth service
 		// list of serivce

@@ -7,7 +7,7 @@ import (
 
 type controller struct {
 	network.BaseController
-	service Service
+	Service Service
 }
 
 func NewController(
@@ -16,16 +16,17 @@ func NewController(
 	service Service,
 ) network.Controller {
 	return &controller{
-		BaseController: network.NewBaseController("/health", authProvider, authorizeProvider),
+		BaseController: network.NewBaseController("health", authProvider, authorizeProvider),
+		Service:        service,
 	}
 }
+
 func (c *controller) MountRoutes(group *gin.RouterGroup) {
-	group.GET("/", c.getApplicationHealth)
+	group.GET("", c.getApplicationHealth)
 }
 
 func (c *controller) getApplicationHealth(ctx *gin.Context) {
-	data, err := c.service.GetApplicationHealth()
-
+	data, err := c.Service.GetApplicationHealth()
 	if err != nil {
 		c.Send(ctx).MixedError(err)
 		return

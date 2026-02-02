@@ -14,11 +14,15 @@ type Service interface {
 }
 type service struct {
 	network.BaseService
+	env       string
+	startTime time.Time
 }
 
-func NewService() Service {
+func NewService(env string, startTime time.Time) Service {
 	return &service{
 		BaseService: network.NewBaseService(),
+		env:         env,
+		startTime:   startTime,
 	}
 }
 
@@ -29,8 +33,8 @@ func (s *service) GetApplicationHealth() (*dto.InfoHealth, error) {
 	return &dto.InfoHealth{
 		Application: "carma-server",
 		Version:     "1.0.0",
-		Environment: s.Context().Value("env").(string),
-		Uptime:      time.Since(s.Context().Value("start_time").(time.Time)).String(),
+		Environment: s.env,
+		Uptime:      time.Since(s.startTime).String(),
 		Memory:      fmt.Sprintf("%d MB", m.Alloc/1024/1024),
 		CPU:         fmt.Sprintf("%d", runtime.NumCPU()),
 	}, nil

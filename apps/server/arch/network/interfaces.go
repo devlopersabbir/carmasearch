@@ -101,25 +101,39 @@ type AuthenticationProvider Param0MiddlewareProvider
 type AuthorizationProvider ParamNMiddlewareProvider[string]
 
 type BaseRouter interface {
+	// gin engine instance
 	GetEngine() *gin.Engine
+	// register validation parsers
 	RegisterValidationParsers(tagNameFunc validator.TagNameFunc)
+	// load root middlewares
 	LoadRootMiddlewares(middlewares []RootMiddleware)
+	// start server
 	Start(ip string, port uint16)
 }
 
 type Router interface {
+	// base router
 	BaseRouter
+	// load controllers
 	LoadControllers(controllers []Controller)
+	// load group
+	LoadGroup(path string, controllers []Controller)
 }
 
 type BaseModule[T any] interface {
+	// module instance
 	GetInstance() *T
+	// root middlewares
 	RootMiddlewares() []RootMiddleware
+	// authentication provider
 	AuthenticationProvider() AuthenticationProvider
+	// authorization provider
 	AuthorizationProvider() AuthorizationProvider
 }
 
 type Module[T any] interface {
+	// base module
 	BaseModule[T]
+	// controllers
 	Controllers() []Controller
 }

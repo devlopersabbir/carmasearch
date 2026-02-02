@@ -38,6 +38,14 @@ func (r *router) LoadControllers(controllers []Controller) {
 	}
 }
 
+func (r *router) LoadGroup(path string, controllers []Controller) {
+	group := r.engine.Group(path)
+	for _, c := range controllers {
+		g := group.Group(c.Path())
+		c.MountRoutes(g)
+	}
+}
+
 func (r *router) Start(ip string, port uint16) {
 	address := fmt.Sprintf("%s:%d", ip, port)
 	r.engine.Run(address)

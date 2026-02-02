@@ -15,6 +15,13 @@ run: ## Run the application
 	@echo "Starting server..."
 	go run ./cmd/main.go
 
+dev:
+	@echo "Starting server in development mode..."
+	go run ./cmd/main.go --env=development 
+
+dev-air:
+	@echo "Starting server in development mode with air..."
+	air
 start-prod:
 	@echo "Starting server..."
 	./bin/$(BINARY_NAME)
