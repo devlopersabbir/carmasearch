@@ -1,0 +1,11 @@
+{
+  "method": "scrape",
+  "params":
+    {
+      "url": "https://example.com",
+      "timeout": 8,
+      "headers": { "User-Agent": "CarmaSearchBot/1.0" },
+      "selectors":
+        { "title": "title", "price": ".price", "year": ".model-year" },
+    },
+}
