@@ -5,6 +5,7 @@ services:
     platform: linux/amd64
     profiles:
       - prod
+      - server
     build:
       context: ../../apps/server
       dockerfile: Dockerfile.server
@@ -21,6 +22,7 @@ services:
     container_name: carma-scraper
     profiles:
       - prod
+      - scraper
     build:
       context: ../../apps/scraper
       dockerfile: Dockerfile.scraper
@@ -42,6 +44,7 @@ services:
     platform: linux/amd64
     profiles:
       - prod
+      - web
     build:
       context: ../../apps/web
       dockerfile: Dockerfile.web
@@ -58,6 +61,7 @@ services:
     profiles:
       - dev
       - prod
+      - db
     environment:
       POSTGRES_USER: ${DB_USER:-carma_user}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-carma0912pass}
@@ -85,6 +89,7 @@ services:
     profiles:
       - dev
       - prod
+      - redis
     ports:
       - "6379:6379"
     networks:
