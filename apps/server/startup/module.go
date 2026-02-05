@@ -6,6 +6,8 @@ import (
 
 	"github.com/carmasearch/carma-server/api/health"
 	"github.com/carmasearch/carma-server/api/root"
+	"github.com/carmasearch/carma-server/api/vehicle"
+	vehicleDomain "github.com/carmasearch/carma-server/api/vehicle/domain"
 	coreMW "github.com/carmasearch/carma-server/arch/middleware"
 	"github.com/carmasearch/carma-server/arch/network"
 	"github.com/carmasearch/carma-server/arch/redis"
@@ -16,9 +18,10 @@ import (
 type Module network.Module[module]
 
 type module struct {
-	Context       context.Context
-	RootService   root.Service
-	HealthService health.Service
+	Context        context.Context
+	RootService    root.Service
+	HealthService  health.Service
+	VehicleService vehicleDomain.Service
 	// List of service is here
 	// UserService
 	// AuthService and rest...
@@ -33,6 +36,7 @@ func (m *module) Controllers() []network.Controller {
 		health.NewController(m.AuthenticationProvider(), m.AuthorizationProvider(), m.HealthService),
 		root.NewController(m.AuthenticationProvider(), m.AuthorizationProvider(), m.RootService),
 		// list of controller register will be here...
+		vehicle.NewController(m.AuthenticationProvider(), m.AuthorizationProvider(), m.VehicleService),
 	}
 }
 
@@ -59,5 +63,6 @@ func NewModule(ctx context.Context, env *config.Config, db *gorm.DB, store redis
 		// userservice
 		// auth service
 		// list of serivce
+		VehicleService: vehicle.NewService(vehicle.NewRepository(db)),
 	}
 }

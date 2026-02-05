@@ -5,7 +5,7 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/carmasearch/carma-server/api/health/dto"
+	dto "github.com/carmasearch/carma-server/api/health/dto"
 	"github.com/carmasearch/carma-server/arch/network"
 )
 

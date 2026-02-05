@@ -1,4 +1,4 @@
-package domain
+package dto
 
 type InfoHealth struct {
 	Application string `json:"application"`
