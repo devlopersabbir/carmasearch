@@ -24,6 +24,7 @@ func NewController(
 func (c *controller) MountRoutes(group *gin.RouterGroup) {
 	group.GET("", c.rootHandler)
 }
+
 func (c *controller) rootHandler(ctx *gin.Context) {
 	c.Send(ctx).SuccessMsgResponse("Welcome to Carmasearch API Server")
 }

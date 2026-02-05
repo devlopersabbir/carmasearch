@@ -48,7 +48,7 @@ func create(env *config.Config) (network.Router, Shutdown) {
 	router := network.NewRouter(env.Server.Environment)
 	router.RegisterValidationParsers(network.CustomTagNameFunc())
 	router.LoadRootMiddlewares(module.RootMiddlewares())
-	router.LoadGroup("/api/v1", module.Controllers())
+	router.LoadGroup("", module.Controllers())
 
 	shutdown := func() {
 		store.Disconnect()
