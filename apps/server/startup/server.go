@@ -6,10 +6,8 @@ import (
 	"strconv"
 
 	"github.com/carmasearch/carma-server/arch/network"
-	"github.com/carmasearch/carma-server/arch/redis"
 	"github.com/carmasearch/carma-server/internal/config"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
+	"github.com/carmasearch/carma-server/internal/database"
 )
 
 type Shutdown = func()
@@ -31,16 +29,8 @@ func Server() {
 
 func create(env *config.Config) (network.Router, Shutdown) {
 	ctx := context.Background()
+	db, store := database.OpenConnection(env, ctx)
 
-	dsn := env.GeneratePGConnectionString()
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-
-	if err != nil {
-		panic("failed to connect database: " + err.Error())
-	}
-
-	store := redis.NewStore(ctx, &env.Redis)
-	store.Connect()
 	// define module here
 	module := NewModule(ctx, env, db, store)
 

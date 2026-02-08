@@ -6,6 +6,7 @@ import (
 	"github.com/carmasearch/carma-server/api/vehicle/core"
 	"github.com/carmasearch/carma-server/api/vehicle/domain"
 	"github.com/carmasearch/carma-server/arch/network"
+	"github.com/carmasearch/carma-server/internal/utils"
 )
 
 type service struct {
@@ -24,6 +25,17 @@ func (s *service) CreateVehicle(vehicle *core.Vehicle) error {
 	// Add validation logic here if needed
 	if vehicle.Title == "" {
 		return errors.New("title is required")
+	}
+	// generate slug
+	slug := utils.Slugify(vehicle.Title, utils.Options{
+		Replacement: "-",
+		Strict:      true,
+	})
+	vehicle.Slug = slug
+	v, err := s.repo.FindByTitle(vehicle.Slug)
+
+	if err != nil || v != nil {
+		return errors.New("Vehicle already exits with this title")
 	}
 	return s.repo.Create(vehicle)
 }

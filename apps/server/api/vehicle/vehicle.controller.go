@@ -21,7 +21,7 @@ func NewController(
 	service domain.Service,
 ) network.Controller {
 	return &vehicleController{
-		BaseController: network.NewBaseController("/api/v1/vehicles", authProvider, authorizeProvider),
+		BaseController: network.NewBaseController("/api/v1", authProvider, authorizeProvider),
 		service:        service,
 	}
 }
@@ -78,7 +78,7 @@ func (c *vehicleController) list(ctx *gin.Context) {
 }
 
 func (c *vehicleController) MountRoutes(group *gin.RouterGroup) {
-	vehicleGroup := group.Group("/vehicles")
+	vehicleGroup := group.Group("vehicles")
 	{
 		vehicleGroup.POST("", c.create)
 		vehicleGroup.GET("/:id", c.get)

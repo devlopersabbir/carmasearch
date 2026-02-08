@@ -10,6 +10,8 @@ type repository struct {
 	db *gorm.DB
 }
 
+var vehicle core.Vehicle
+
 func NewRepository(db *gorm.DB) domain.Repository {
 	return &repository{
 		db: db,
@@ -21,8 +23,15 @@ func (r *repository) Create(vehicle *core.Vehicle) error {
 }
 
 func (r *repository) FindByID(id uint) (*core.Vehicle, error) {
-	var vehicle core.Vehicle
 	if err := r.db.First(&vehicle, id).Error; err != nil {
+		return nil, err
+	}
+	return &vehicle, nil
+}
+
+// Find by Slug
+func (r *repository) FindByTitle(slug string) (*core.Vehicle, error) {
+	if err := r.db.First(&vehicle, slug).Error; err != nil {
 		return nil, err
 	}
 	return &vehicle, nil
