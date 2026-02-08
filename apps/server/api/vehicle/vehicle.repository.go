@@ -11,6 +11,7 @@ type repository struct {
 }
 
 var vehicle core.Vehicle
+var vehicles []core.Vehicle
 
 func NewRepository(db *gorm.DB) domain.Repository {
 	return &repository{
@@ -42,14 +43,13 @@ func (r *repository) Update(vehicle *core.Vehicle) error {
 }
 
 func (r *repository) Delete(id uint) error {
-	return r.db.Delete(&core.Vehicle{}, id).Error
+	return r.db.Delete(&vehicle, id).Error
 }
 
 func (r *repository) List(limit, offset int) ([]core.Vehicle, int64, error) {
-	var vehicles []core.Vehicle
 	var count int64
 
-	if err := r.db.Model(&core.Vehicle{}).Count(&count).Error; err != nil {
+	if err := r.db.Model(&vehicle).Count(&count).Error; err != nil {
 		return nil, 0, err
 	}
 

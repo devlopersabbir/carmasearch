@@ -72,7 +72,7 @@ type Vehicle struct {
 	Gearbox           string    `json:"gearbox"` // manual, automatic
 
 	// Features & History
-	Features               StringArray `json:"features" gorm:"type:text"` // JSON array of features
+	Features               StringArray `json:"features" gorm:"type:jsonb"` // JSON array of features
 	DamageUnrepaired       bool        `json:"damage_unrepaired"`
 	Roadworthy             bool        `json:"roadworthy"`
 	AccidentDamaged        bool        `json:"accident_damaged"`
@@ -93,7 +93,7 @@ type Vehicle struct {
 	SellerCountry string `json:"seller_country"`
 
 	// Media
-	Images StringArray `json:"images" gorm:"type:text"` // JSON array of image URLs
+	Images StringArray `json:"images" gorm:"type:jsonb"` // JSON array of image URLs
 
 	// Metadata
 	ExternalID string `json:"external_id" gorm:"index"` // inner_id from source
