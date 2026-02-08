@@ -29,14 +29,16 @@ func (s *service) CreateVehicle(vehicle *core.Vehicle) error {
 	// generate slug
 	slug := utils.Slugify(vehicle.Title, utils.Options{
 		Replacement: "-",
-		Strict:      true,
+		Strict:      false,
+		Lower:       true,
 	})
-	vehicle.Slug = slug
-	v, err := s.repo.FindByTitle(vehicle.Slug)
+	v, err := s.repo.FindBySlug(slug)
 
-	if err != nil || v != nil {
+	if v != nil && err == nil {
 		return errors.New("Vehicle already exits with this title")
 	}
+
+	vehicle.Slug = slug
 	return s.repo.Create(vehicle)
 }
 

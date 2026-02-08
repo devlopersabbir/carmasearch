@@ -26,5 +26,7 @@ func OpenConnection(env *config.Config, ctx context.Context) (*gorm.DB, redis.St
 	store := redis.NewStore(ctx, &env.Redis)
 	store.Connect()
 
+	go RunVehicleSeedOnce(db)
+
 	return db, store
 }

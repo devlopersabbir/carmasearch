@@ -7,7 +7,7 @@ import (
 type Repository interface {
 	Create(vehicle *core.Vehicle) error
 	FindByID(id uint) (*core.Vehicle, error)
-	FindByTitle(slug string) (*core.Vehicle, error)
+	FindBySlug(slug string) (*core.Vehicle, error)
 	Update(vehicle *core.Vehicle) error
 	Delete(id uint) error
 	List(limit, offset int) ([]core.Vehicle, int64, error)

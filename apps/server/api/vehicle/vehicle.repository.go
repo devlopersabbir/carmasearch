@@ -30,8 +30,8 @@ func (r *repository) FindByID(id uint) (*core.Vehicle, error) {
 }
 
 // Find by Slug
-func (r *repository) FindByTitle(slug string) (*core.Vehicle, error) {
-	if err := r.db.First(&vehicle, slug).Error; err != nil {
+func (r *repository) FindBySlug(slug string) (*core.Vehicle, error) {
+	if err := r.db.First(&vehicle, "slug = ?", slug).Error; err != nil {
 		return nil, err
 	}
 	return &vehicle, nil
