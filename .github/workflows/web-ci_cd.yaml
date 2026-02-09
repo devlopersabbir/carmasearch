@@ -1,0 +1,28 @@
+name: Web CI
+
+on:
+  push:
+    branches: [main, dev]
+    paths:
+      - "apps/web/**"
+  pull_request:
+    paths:
+      - "apps/web/**"
+
+jobs:
+  web-ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: "pnpm"
+      - name: Application Build test
+        run: make web-build

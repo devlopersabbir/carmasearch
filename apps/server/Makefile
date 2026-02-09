@@ -1,7 +1,7 @@
 .PHONY: help run build test lint clean migrate-up migrate-down migrate-force
 
 # Variables
-BINARY_NAME=carma-server
+BINARY_NAME=carmasearch-server
 MIGRATE=migrate
 DB_URL=postgres://carma_user:carma_password@localhost:5432/carma_db?sslmode=disable
 
