@@ -1,4 +1,4 @@
-APP_NAME=nextjs-app
+APP_NAME=carmasearch-web
 PORT=3000
 PACKAGE_MANAGER=pnpm
 
@@ -22,19 +22,19 @@ install:
 dev: install
 	$(PACKAGE_MANAGER) dev --port $(PORT)
 
-build:
+build: install
 	$(PACKAGE_MANAGER) build
 
-start:
+start: install
 	$(PACKAGE_MANAGER) start --port $(PORT)
 
-lint:
+lint: install
 	$(PACKAGE_MANAGER) lint
 
-format:
+format: install
 	$(PACKAGE_MANAGER) prettier --write .
 
-clean:
+clean: install
 	rm -rf .next out node_modules
 
 docker-build:
