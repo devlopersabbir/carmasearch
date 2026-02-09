@@ -13,6 +13,7 @@ export default function HeaderMenu() {
   const { isAuthenticated } = useAuthStore((state) => state);
   const { setAuthMode } = useAuthModeStore((state) => state);
   const { setIsAuthModalOpen } = useAuthModelStore((state) => state);
+
   return (
     <React.Fragment>
       <Button

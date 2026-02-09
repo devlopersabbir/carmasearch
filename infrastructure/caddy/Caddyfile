@@ -1,0 +1,11 @@
+api.example.com {
+    reverse_proxy localhost:8080
+}
+
+website.example.com {
+    reverse_proxy localhost:3000
+}
+
+scraper.example.com {
+    reverse_proxy localhost:5000
+}

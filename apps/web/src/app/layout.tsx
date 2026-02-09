@@ -6,6 +6,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { Toaster } from "@/components/ui/sonner";
 import { Suspense } from "react";
 import "./globals.css";
+import GlobalProvider from "@/components/providers/global-provider";
 
 export const metadata: Metadata = {
   title: "Carma Search",
@@ -22,7 +23,7 @@ export default function RootLayout({
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
         <Suspense fallback={null}>
           {children}
-          <Toaster />
+          <GlobalProvider />
         </Suspense>
         <Analytics />
       </body>

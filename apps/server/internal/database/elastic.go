@@ -13,11 +13,11 @@ var ESClient *elasticsearch.Client
 const SearchIndex = "bmw"
 
 func ESClientConnection() {
-	client, err := elasticsearch.NewDefaultClient()
+	es, err := elasticsearch.NewDefaultClient()
 	if err != nil {
-		panic(err)
+		log.Fatalf("Error getting response: %s", err)
 	}
-	ESClient = client
+	ESClient = es
 	log.Println("Elastic Search Client Connected")
 }
 

@@ -77,11 +77,12 @@ func (c *vehicleController) list(ctx *gin.Context) {
 	})
 }
 
-func (c *vehicleController) MountRoutes(group *gin.RouterGroup) {
-	vehicleGroup := group.Group("vehicles")
-	{
-		vehicleGroup.POST("", c.create)
-		vehicleGroup.GET("/:id", c.get)
-		vehicleGroup.GET("", c.list)
-	}
-}
+//	func (c *vehicleController) MountRoutes(group *gin.RouterGroup) {
+//		// vehicleGroup := group.Group("vehicles")
+//		// {
+//		// 	vehicleGroup.POST("", c.create)
+//		// 	vehicleGroup.GET("/:id", c.get)
+//		// 	vehicleGroup.GET("", c.list)
+//		// }
+//	}
+func (c *vehicleController) MountRoutes(group *gin.RouterGroup) {}

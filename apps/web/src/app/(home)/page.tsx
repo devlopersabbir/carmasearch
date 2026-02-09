@@ -6,7 +6,6 @@ import VehiclesCounts from "./_components/stats-section/vehicles-counts";
 import FeaturesSection from "./_components/features-section/section";
 import LogoScrolling from "./_components/branding-section/logo-scrolling";
 import PricingAlert from "./_components/pricing-alert-section/pricing-alert";
-import React from "react";
 
 export default function Home() {
   return (
@@ -109,21 +108,6 @@ export default function Home() {
       </section>
 
       {/* Modals */}
-      <React.Fragment>
-        {/* <CompareModal
-        isOpen={isCompareModalOpen}
-        onClose={() => setIsCompareModalOpen(false)}
-      />
-      <MobileMenu
-        isOpen={isMobileMenuOpen}
-        onClose={() => setIsMobileMenuOpen(false)}
-      />
-      <AuthModal
-        isOpen={isAuthModalOpen}
-        onClose={() => setIsAuthModalOpen(false)}
-        mode={authMode}
-      /> */}
-      </React.Fragment>
     </div>
   );
 }
