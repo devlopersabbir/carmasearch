@@ -16,5 +16,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24
-      - name: Build
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - name: Build test
         run: make web-build
