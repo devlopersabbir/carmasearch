@@ -10,9 +10,6 @@ type repository struct {
 	db *gorm.DB
 }
 
-var vehicle core.Vehicle
-var vehicles []core.Vehicle
-
 func NewRepository(db *gorm.DB) domain.Repository {
 	return &repository{
 		db: db,
@@ -24,6 +21,7 @@ func (r *repository) Create(vehicle *core.Vehicle) error {
 }
 
 func (r *repository) FindByID(id uint) (*core.Vehicle, error) {
+	var vehicle core.Vehicle
 	if err := r.db.First(&vehicle, id).Error; err != nil {
 		return nil, err
 	}
@@ -32,6 +30,8 @@ func (r *repository) FindByID(id uint) (*core.Vehicle, error) {
 
 // Find by Slug
 func (r *repository) FindBySlug(slug string) (*core.Vehicle, error) {
+	var vehicle core.Vehicle
+
 	if err := r.db.First(&vehicle, "slug = ?", slug).Error; err != nil {
 		return nil, err
 	}
@@ -43,10 +43,13 @@ func (r *repository) Update(vehicle *core.Vehicle) error {
 }
 
 func (r *repository) Delete(id uint) error {
+	var vehicle core.Vehicle
 	return r.db.Delete(&vehicle, id).Error
 }
 
 func (r *repository) List(limit, offset int) ([]core.Vehicle, int64, error) {
+	var vehicle core.Vehicle
+	var vehicles []core.Vehicle
 	var count int64
 
 	if err := r.db.Model(&vehicle).Count(&count).Error; err != nil {

@@ -9,6 +9,7 @@ type Config struct {
 	Server   ServerConfig
 	Database DatabaseConfig
 	Redis    RedisConfig
+	Elastic  ElasticConfig
 	Logging  LoggingConfig
 	CORS     CORSConfig
 }
@@ -41,6 +42,11 @@ type RedisConfig struct {
 	Addr     string
 	Password string
 	DB       int
+}
+
+// ElasticConfig holds elastic search configuration
+type ElasticConfig struct {
+	Addr string
 }
 
 // LoggingConfig holds logging configuration

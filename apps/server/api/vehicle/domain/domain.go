@@ -2,7 +2,15 @@ package domain
 
 import (
 	"github.com/carmasearch/carma-server/api/vehicle/core"
+	elasticCore "github.com/carmasearch/carma-server/internal/elastic/core"
 )
+
+// CompareRepository is the interface for the compare repository
+// It is used to find similar vehicles based on the given vehicle
+// and the given limit
+type CompareRepository interface {
+	FindSimilar(vehicle *core.Vehicle, limit int) ([]elasticCore.VehicleCompareResult, error)
+}
 
 type Repository interface {
 	Create(vehicle *core.Vehicle) error

@@ -4,21 +4,36 @@ import (
 	"context"
 	"log"
 
-	"github.com/elastic/go-elasticsearch/v9"
-	"github.com/elastic/go-elasticsearch/v9/esapi"
+	"github.com/carmasearch/carma-server/internal/config"
+	"github.com/elastic/go-elasticsearch/v7"
+	"github.com/elastic/go-elasticsearch/v7/esapi"
 )
 
 var ESClient *elasticsearch.Client
 
 const SearchIndex = "bmw"
 
-func ESClientConnection() {
-	es, err := elasticsearch.NewDefaultClient()
+func ESClientConnection(config *config.ElasticConfig) {
+	es, err := elasticsearch.NewClient(elasticsearch.Config{
+		Addresses: []string{
+			config.Addr,
+		},
+		MaxRetries:    3,
+		RetryOnStatus: []int{502, 503, 504},
+	})
 	if err != nil {
-		log.Fatalf("Error getting response: %s", err)
+		log.Fatalf("failed to create elastic client: %v", err)
 	}
+
+	// Ping cluster
+	res, err := es.Info()
+	if err != nil {
+		log.Fatalf("elastic ping failed: %v", err)
+	}
+	defer res.Body.Close()
+
 	ESClient = es
-	log.Println("Elastic Search Client Connected")
+	log.Println("✅ Elasticsearch connected")
 }
 
 func ESCreateIndexIfNotExist() {

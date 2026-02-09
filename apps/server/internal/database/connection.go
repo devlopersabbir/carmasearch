@@ -27,7 +27,7 @@ func OpenConnection(env *config.Config, ctx context.Context) (*gorm.DB, redis.St
 	store.Connect()
 
 	// Elastic Search Connection
-	ESClientConnection()
+	ESClientConnection(&env.Elastic)
 	ESCreateIndexIfNotExist()
 
 	return db, store

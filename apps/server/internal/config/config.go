@@ -37,6 +37,9 @@ func LoadEnv(path string) (*Config, error) {
 			Password: GetEnv("REDIS_PASSWORD", ""),
 			DB:       GetIntEnv("REDIS_DB", 0),
 		},
+		Elastic: ElasticConfig{
+			Addr: GetEnv("ELASTIC_ADDR", "http://localhost:9200"),
+		},
 		Logging: LoggingConfig{
 			Level:  GetEnv("LOG_LEVEL", "info"),
 			Format: GetEnv("LOG_FORMAT", "json"),
