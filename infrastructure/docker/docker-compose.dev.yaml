@@ -1,0 +1,129 @@
+services:
+  server:
+    image: devlopersabbir/carmasearch-server:latest
+    container_name: carma-server
+    platform: linux/amd64
+    profiles:
+      - prod
+      - server
+    build:
+      context: ../../apps/server
+      dockerfile: Dockerfile.server
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    env_file:
+      - ../../apps/server/.env
+    networks:
+      - carmasearch
+
+  scraper:
+    image: devlopersabbir/carmasearch-scraper:latest
+    platform: linux/amd64
+    container_name: carma-scraper
+    profiles:
+      - prod
+      - scraper
+    build:
+      context: ../../apps/scraper
+      dockerfile: Dockerfile.scraper
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    ports:
+      - 8000:8000
+    env_file:
+      - ../../apps/scraper/.env
+    networks:
+      - carmasearch
+
+  web:
+    container_name: carma-web
+    image: devlopersabbir/carmasearch-web:latest
+    platform: linux/amd64
+    profiles:
+      - prod
+      - web
+    build:
+      context: ../../apps/web
+      dockerfile: Dockerfile.web
+    ports:
+      - "3000:3000"
+    env_file:
+      - ../../apps/web/.env
+    networks:
+      - carmasearch
+
+  db:
+    image: postgres:16-alpine
+    container_name: carma_db
+    profiles:
+      - dev
+      - prod
+      - db
+    environment:
+      POSTGRES_USER: ${DB_USER:-carma_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-carma0912pass}
+      POSTGRES_DB: ${DB_NAME:-carma_db}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${DB_USER:-carma_user} -d ${DB_NAME:-carma_db}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - carmasearch
+    restart: unless-stopped
+  redis:
+    image: redis:alpine
+    container_name: redis
+    profiles:
+      - dev
+      - prod
+      - redis
+    ports:
+      - "6379:6379"
+    networks:
+      - carmasearch
+    restart: unless-stopped
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.5.2
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+    profiles:
+      - dev
+      - prod
+      - elasticsearch
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch:/usr/share/elasticsearch/data
+    networks:
+      - carmasearch
+    restart: unless-stopped
+
+networks:
+  carmasearch:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  elasticsearch:
+    driver: local
