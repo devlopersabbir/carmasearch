@@ -1,7 +1,11 @@
 import { mileageFormatter } from "@/constants";
 import { currencyFormatter } from "@/constants/currency";
 
-// Format deal score for display
+/**
+ * Format deal score for display
+ * @param rawScore - The raw deal score
+ * @returns An object with the formatted deal score text, class, and isGood flag
+ */
 export function formatDealScore(rawScore?: number | null): {
   text: string;
   class: string;
