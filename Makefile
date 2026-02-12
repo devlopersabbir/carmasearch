@@ -7,6 +7,9 @@ docker-build:
 docker-up:
 	docker compose -f infrastructure/docker/docker-compose.yaml --profile prod up -d
 
+docker-dev:
+	docker compose -f infrastructure/docker/docker-compose.dev.yaml --profile dev up -d
+
 docker-down:
 	docker compose -f infrastructure/docker/docker-compose.yaml --profile prod down
 
