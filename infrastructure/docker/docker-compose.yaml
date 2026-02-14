@@ -108,6 +108,25 @@ services:
       - carmasearch
     restart: unless-stopped
 
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.5.2
+    container_name: kibana
+    profiles:
+      - dev
+      - prod
+      - kibana
+    ports:
+      - "5601:5601"
+    environment:
+      ELASTICSEARCH_HOSTS: http://localhost:9200
+      ELASTICSEARCH_USERNAME: elastic
+      ELASTICSEARCH_PASSWORD: changeme
+    networks:
+      - carmasearch
+    restart: unless-stopped
+
+
+
 networks:
   carmasearch:
     driver: bridge

@@ -10,6 +10,9 @@ docker-up:
 docker-down:
 	docker compose -f infrastructure/docker/docker-compose.yaml --profile prod down
 
+docker-dev:
+	docker compose -f infrastructure/docker/docker-compose.dev.yaml --profile dev up -d
+
 # ---------- Apps ----------
 web-%:
 	$(MAKE) -C apps/web $*

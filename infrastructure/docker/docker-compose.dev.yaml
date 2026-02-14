@@ -88,6 +88,7 @@ services:
     networks:
       - carmasearch
     restart: unless-stopped
+
   redis:
     image: redis:alpine
     container_name: redis
@@ -97,15 +98,16 @@ services:
       - redis
     ports:
       - "6379:6379"
+    restart: unless-stopped
     networks:
       - carmasearch
-    restart: unless-stopped
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.5.2
     container_name: elasticsearch
     environment:
       - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
     profiles:
       - dev
       - prod
@@ -114,9 +116,38 @@ services:
       - "9200:9200"
     volumes:
       - elasticsearch:/usr/share/elasticsearch/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -fs http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=1s || exit 1"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 40s 
+    restart: unless-stopped
     networks:
       - carmasearch
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.5.2
+    container_name: kibana
+    profiles:
+      - dev
+      - prod
+      - kibana
+    ports:
+      - "5601:5601"
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
     restart: unless-stopped
+    networks:
+      - carmasearch
+
 
 networks:
   carmasearch:
