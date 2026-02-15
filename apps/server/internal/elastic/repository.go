@@ -63,6 +63,11 @@ func (r *CompareRepository) FindSimilar(v *vehicleCore.Vehicle, limit int) ([]el
 							},
 						},
 					},
+					map[string]interface{}{
+						"term": map[string]interface{}{
+							"color": v.Color,
+						},
+					},
 				},
 			},
 		},

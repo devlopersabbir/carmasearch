@@ -20,6 +20,7 @@ func parseCompareResults(body io.Reader) ([]core.VehicleCompareResult, error) {
 					Year    int     `json:"year"`
 					Price   float64 `json:"price"`
 					Mileage int     `json:"mileage"`
+					Color   int     `json:"color"`
 					City    string  `json:"city"`
 				} `json:"_source"`
 			} `json:"hits"`

@@ -7,6 +7,7 @@ type VehicleESDoc struct {
 	Year     int     `json:"year"`
 	Price    float64 `json:"price"`
 	Mileage  int     `json:"mileage"`
+	Color    int     `json:"color"`
 	FuelType string  `json:"fuel_type"`
 	Gearbox  string  `json:"gearbox"`
 	BodyType string  `json:"body_type"`

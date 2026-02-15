@@ -12,13 +12,12 @@ import (
 var ESClient *elasticsearch.Client
 
 func ESClientConnection(config *config.ElasticConfig) {
-	es, err := elasticsearch.NewClient(elasticsearch.Config{
-		Addresses: []string{
-			config.Addr,
-		},
-		MaxRetries:    3,
-		RetryOnStatus: []int{502, 503, 504},
-	})
+	esConfig := elasticsearch.Config{
+		Addresses: config.ESAddresses,
+		Username:  config.ESUsername,
+		Password:  config.ESPassword,
+	}
+	es, err := elasticsearch.NewClient(esConfig)
 	if err != nil {
 		log.Fatalf("failed to create elastic client: %v", err)
 	}

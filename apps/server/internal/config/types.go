@@ -46,7 +46,9 @@ type RedisConfig struct {
 
 // ElasticConfig holds elastic search configuration
 type ElasticConfig struct {
-	Addr string
+	ESAddresses []string
+	ESUsername  string
+	ESPassword  string
 }
 
 // LoggingConfig holds logging configuration
