@@ -1,7 +1,10 @@
 package elastic
 
 import (
+	"log"
+
 	"github.com/carmasearch/carma-server/api/vehicle/core"
+	esCore "github.com/carmasearch/carma-server/internal/elastic/core"
 	"github.com/carmasearch/carma-server/internal/elastic/domain"
 	"github.com/elastic/go-elasticsearch/v7"
 	"gorm.io/gorm"
@@ -15,10 +18,10 @@ type vehicleService struct {
 	db        *gorm.DB
 }
 
-func (s *vehicleService) CompareVehicle(input *core.Vehicle) ([]core.Vehicle, error) {
-
-	// 1️⃣ Query Elasticsearch for best matches
+func (s *vehicleService) CompareVehicle(input *esCore.VehicleSearchQuery) ([]core.Vehicle, error) {
+	log.Println("=========log=========", input)
 	ids, err := s.service.SearchSimilarVehicles(input)
+	log.Println("=========ids=========", ids)
 	if err != nil {
 		return nil, err
 	}
@@ -27,7 +30,6 @@ func (s *vehicleService) CompareVehicle(input *core.Vehicle) ([]core.Vehicle, er
 		return []core.Vehicle{}, nil
 	}
 
-	// 2️⃣ Fetch full vehicles from DB in ranked order
 	vehicles, err := s.repo.GetVehiclesByIDs(ids)
 	if err != nil {
 		return nil, err

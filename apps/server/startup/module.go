@@ -12,16 +12,18 @@ import (
 	"github.com/carmasearch/carma-server/arch/network"
 	"github.com/carmasearch/carma-server/arch/redis"
 	"github.com/carmasearch/carma-server/internal/config"
+	esDomain "github.com/carmasearch/carma-server/internal/elastic/domain"
 	"gorm.io/gorm"
 )
 
 type Module network.Module[module]
 
 type module struct {
-	Context        context.Context
-	RootService    root.Service
-	HealthService  health.Service
-	VehicleService vehicleDomain.Service
+	Context               context.Context
+	RootService           root.Service
+	HealthService         health.Service
+	VehicleService        vehicleDomain.Service
+	VehicleCompareService esDomain.VehicleCompareService
 	// List of service is here
 	// UserService
 	// AuthService and rest...
@@ -36,7 +38,7 @@ func (m *module) Controllers() []network.Controller {
 		health.NewController(m.AuthenticationProvider(), m.AuthorizationProvider(), m.HealthService),
 		root.NewController(m.AuthenticationProvider(), m.AuthorizationProvider(), m.RootService),
 		// list of controller register will be here...
-		vehicle.NewController(m.AuthenticationProvider(), m.AuthorizationProvider(), m.VehicleService),
+		vehicle.NewController(m.AuthenticationProvider(), m.AuthorizationProvider(), m.VehicleService, m.VehicleCompareService),
 	}
 }
 

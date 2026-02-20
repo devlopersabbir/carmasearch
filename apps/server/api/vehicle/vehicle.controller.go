@@ -1,12 +1,14 @@
 package vehicle
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 
 	"github.com/carmasearch/carma-server/api/vehicle/core"
 	"github.com/carmasearch/carma-server/api/vehicle/domain"
 	"github.com/carmasearch/carma-server/arch/network"
+	esCore "github.com/carmasearch/carma-server/internal/elastic/core"
 	esDomain "github.com/carmasearch/carma-server/internal/elastic/domain"
 	"github.com/gin-gonic/gin"
 )
@@ -14,17 +16,19 @@ import (
 type vehicleController struct {
 	network.BaseController
 	service   domain.Service
-	esService esDomain.CompareService
+	esService esDomain.VehicleCompareService
 }
 
 func NewController(
 	authProvider network.AuthenticationProvider,
 	authorizeProvider network.AuthorizationProvider,
 	service domain.Service,
+	esService esDomain.VehicleCompareService,
 ) network.Controller {
 	return &vehicleController{
 		BaseController: network.NewBaseController("/api/v1", authProvider, authorizeProvider),
 		service:        service,
+		esService:      esService,
 	}
 }
 
@@ -104,15 +108,16 @@ func (c *vehicleController) search(ctx *gin.Context) {
 }
 
 func (c *vehicleController) compare(ctx *gin.Context) {
-	var input core.Vehicle
+	var input esCore.VehicleSearchQuery
 
 	// Scraper sends full vehicle JSON here
 	if err := ctx.ShouldBindJSON(&input); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
+	log.Println("there are no error")
 	vehicles, err := c.esService.CompareVehicle(&input)
+	log.Println("vehicless......")
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

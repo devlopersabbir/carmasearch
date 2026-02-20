@@ -11,6 +11,8 @@ import (
 
 var ESClient *elasticsearch.Client
 
+const ESIndexName = "vehicles"
+
 func ESClientConnection(config *config.ElasticConfig) {
 	esConfig := elasticsearch.Config{
 		Addresses: config.ESAddresses,
@@ -33,12 +35,14 @@ func ESClientConnection(config *config.ElasticConfig) {
 	log.Println("✅ Elasticsearch connected")
 }
 
-func ESCreateIndexIfNotExist(indexName string) {
+func ESCreateIndexIfNotExist() {
 	_, err := esapi.IndicesExistsRequest{
-		Index: []string{indexName},
+		Index: []string{ESIndexName},
 	}.Do(context.Background(), ESClient)
 
 	if err != nil {
-		ESClient.Indices.Create(indexName)
+		ESClient.Indices.Create(ESIndexName)
+		log.Printf("✅ Index %s created", ESIndexName)
 	}
+	log.Printf("✅ Index %s already exists", ESIndexName)
 }

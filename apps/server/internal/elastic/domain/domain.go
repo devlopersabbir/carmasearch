@@ -2,17 +2,14 @@ package domain
 
 import (
 	"github.com/carmasearch/carma-server/api/vehicle/core"
+	esCore "github.com/carmasearch/carma-server/internal/elastic/core"
 )
-
-type CompareService interface {
-	CompareVehicle(vehicle *core.Vehicle) ([]core.Vehicle, error)
-}
 
 type VehicleCompareRepository interface {
 	GetVehiclesByIDs(ids []uint) ([]core.Vehicle, error)
 }
 
 type VehicleCompareService interface {
-	CompareVehicle(vehicle *core.Vehicle) ([]core.Vehicle, error)
-	SearchSimilarVehicles(input *core.Vehicle) ([]uint, error)
+	CompareVehicle(vehicle *esCore.VehicleSearchQuery) ([]core.Vehicle, error)
+	SearchSimilarVehicles(input *esCore.VehicleSearchQuery) ([]uint, error)
 }

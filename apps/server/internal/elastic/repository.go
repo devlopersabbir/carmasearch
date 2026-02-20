@@ -6,9 +6,10 @@ import (
 	"encoding/json"
 
 	"github.com/carmasearch/carma-server/api/vehicle/core"
+	esCore "github.com/carmasearch/carma-server/internal/elastic/core"
 )
 
-func (s *vehicleService) searchSimilarVehicles(input *core.Vehicle) ([]uint, error) {
+func (s *vehicleService) SearchSimilarVehicles(input *esCore.VehicleSearchQuery) ([]uint, error) {
 
 	query := map[string]interface{}{
 		"size": 20,
@@ -24,12 +25,12 @@ func (s *vehicleService) searchSimilarVehicles(input *core.Vehicle) ([]uint, err
 				"must": []interface{}{
 					map[string]interface{}{
 						"match": map[string]interface{}{
-							"make": input.Make,
+							"make": *input.Make,
 						},
 					},
 					map[string]interface{}{
 						"match": map[string]interface{}{
-							"model": input.Model,
+							"model": *input.Model,
 						},
 					},
 				},
@@ -37,8 +38,8 @@ func (s *vehicleService) searchSimilarVehicles(input *core.Vehicle) ([]uint, err
 					map[string]interface{}{
 						"range": map[string]interface{}{
 							"year": map[string]interface{}{
-								"gte":   input.Year - 2,
-								"lte":   input.Year + 2,
+								"gte":   *input.RegistrationFrom - 2,
+								"lte":   *input.RegistrationTo + 2,
 								"boost": 2,
 							},
 						},
@@ -46,8 +47,8 @@ func (s *vehicleService) searchSimilarVehicles(input *core.Vehicle) ([]uint, err
 					map[string]interface{}{
 						"range": map[string]interface{}{
 							"price": map[string]interface{}{
-								"gte":   input.Price * 0.85,
-								"lte":   input.Price * 1.15,
+								"gte":   *input.PriceFrom * 0.85,
+								"lte":   *input.PriceTo * 1.15,
 								"boost": 3,
 							},
 						},

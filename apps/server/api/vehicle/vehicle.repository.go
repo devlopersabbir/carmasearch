@@ -1,8 +1,12 @@
 package vehicle
 
 import (
+	"encoding/json"
+	"strings"
+
 	"github.com/carmasearch/carma-server/api/vehicle/core"
 	"github.com/carmasearch/carma-server/api/vehicle/domain"
+	esClient "github.com/carmasearch/carma-server/internal/database"
 	"gorm.io/gorm"
 )
 
@@ -17,7 +21,20 @@ func NewRepository(db *gorm.DB) domain.Repository {
 }
 
 func (r *repository) Create(vehicle *core.Vehicle) error {
-	return r.db.Create(vehicle).Error
+	// create
+	if err := r.db.Create(vehicle).Error; err != nil {
+		return err
+	}
+	data, _ := json.Marshal(vehicle)
+	_, err := esClient.ESClient.Index(
+		esClient.ESIndexName,
+		strings.NewReader(string(data)),
+		esClient.ESClient.Index.WithRefresh("true"),
+	)
+	if err != nil {
+		panic(err)
+	}
+	return nil
 }
 
 func (r *repository) FindByID(id uint) (*core.Vehicle, error) {
