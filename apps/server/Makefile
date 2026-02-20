@@ -16,10 +16,6 @@ run: ## Run the application
 	go run ./cmd/main.go
 
 dev:
-	@echo "Starting server in development mode..."
-	go run ./cmd/main.go --env=development 
-
-dev-air:
 	@echo "Starting server in development mode with air..."
 	air
 start-prod:
@@ -60,15 +56,6 @@ deps: ## Download dependencies
 	go mod download
 	go mod tidy
 
-# Database migrations
-migrate-up: ## Run database migrations
-	@echo "Running migrations..."
-	@if command -v migrate >/dev/null 2>&1; then \
-		migrate -path migrations -database "$(DB_URL)" up; \
-	else \
-		echo "migrate not installed. Install it from https://github.com/golang-migrate/migrate"; \
-	fi
-
 migrate-down: ## Rollback last migration
 	@echo "Rolling back migration..."
 	@if command -v migrate >/dev/null 2>&1; then \
@@ -76,14 +63,6 @@ migrate-down: ## Rollback last migration
 	else \
 		echo "migrate not installed. Install it from https://github.com/golang-migrate/migrate"; \
 	fi
-
-migrate-force: ## Force migration version (usage: make migrate-force VERSION=1)
-	@echo "Forcing migration version $(VERSION)..."
-	migrate -path migrations -database "$(DB_URL)" force $(VERSION)
-
-migrate-create: ## Create new migration (usage: make migrate-create NAME=create_users_table)
-	@echo "Creating migration $(NAME)..."
-	migrate create -ext sql -dir migrations -seq $(NAME)
 
 install-tools: ## Install development tools
 	@echo "Installing development tools..."

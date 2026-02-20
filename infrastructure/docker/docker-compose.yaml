@@ -125,8 +125,6 @@ services:
       - carmasearch
     restart: unless-stopped
 
-
-
 networks:
   carmasearch:
     driver: bridge

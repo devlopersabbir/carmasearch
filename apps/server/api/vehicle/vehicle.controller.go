@@ -7,12 +7,14 @@ import (
 	"github.com/carmasearch/carma-server/api/vehicle/core"
 	"github.com/carmasearch/carma-server/api/vehicle/domain"
 	"github.com/carmasearch/carma-server/arch/network"
+	esDomain "github.com/carmasearch/carma-server/internal/elastic/domain"
 	"github.com/gin-gonic/gin"
 )
 
 type vehicleController struct {
 	network.BaseController
-	service domain.Service
+	service   domain.Service
+	esService esDomain.CompareService
 }
 
 func NewController(
@@ -77,11 +79,58 @@ func (c *vehicleController) list(ctx *gin.Context) {
 	})
 }
 
+func (c *vehicleController) search(ctx *gin.Context) {
+	// get all query params without defined key
+	// exmaple /search?version=1&color=red&price=100000
+	// returns map[string][]string
+	rowQueries := ctx.Request.URL.Query()
+	filters := make(map[string]interface{})
+
+	for key, values := range rowQueries {
+		if len(values) == 1 {
+			filters[key] = values[0]
+		} else {
+			// support multi-value filters like ?color=red&color=blue
+			filters[key] = values
+		}
+	}
+	vehicles, err := c.service.SearchVehicles(filters)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, vehicles)
+}
+
+func (c *vehicleController) compare(ctx *gin.Context) {
+	var input core.Vehicle
+
+	// Scraper sends full vehicle JSON here
+	if err := ctx.ShouldBindJSON(&input); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	vehicles, err := c.esService.CompareVehicle(&input)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"data":  vehicles,
+		"count": len(vehicles),
+	})
+}
+
 func (c *vehicleController) MountRoutes(group *gin.RouterGroup) {
 	vehicleGroup := group.Group("vehicles")
 	{
 		vehicleGroup.POST("", c.create)
 		vehicleGroup.GET("/:id", c.get)
 		vehicleGroup.GET("", c.list)
+		vehicleGroup.GET("/search", c.search)
+		vehicleGroup.POST("/compare", c.compare)
 	}
 }

@@ -1,103 +1,114 @@
 package core
 
 import (
-	"database/sql/driver"
-	"encoding/json"
-	"errors"
 	"time"
 
+	utils "github.com/carmasearch/carma-server/internal/utils"
 	"gorm.io/gorm"
 )
 
-// StringArray is a custom type for handling array of strings in DB (e.g. JSON)
-type StringArray []string
-
-func (a *StringArray) Scan(value any) error {
-	bytes, ok := value.([]byte)
-	if !ok {
-		return errors.New("type assertion to []byte failed")
-	}
-	return json.Unmarshal(bytes, a)
-}
-
-func (a StringArray) Value() (driver.Value, error) {
-	return json.Marshal(a)
-}
-
 type Vehicle struct {
-	ID        uint           `json:"id" gorm:"primarykey"`
-	CreatedAt time.Time      `json:"created_at"`
-	UpdatedAt time.Time      `json:"updated_at"`
-	DeletedAt gorm.DeletedAt `json:"deleted_at" gorm:"index"`
+	ID        uint `json:"id" gorm:"primaryKey"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt `gorm:"index"`
 
-	// Vehicle Identifiers
-	Make             string `json:"make" gorm:"index:idx_make_model"`
-	Model            string `json:"model" gorm:"index:idx_make_model"`
-	ModelDescription string `json:"model_description"`
-	ModelVersion     string `json:"model_verison" gorm:"index"`
-	VIN              string `json:"vin" gorm:"uniqueIndex"`
+	// Identifiers
+	VIN        string `json:"vin" gorm:"uniqueIndex"`
+	ExternalID string `json:"external_id" gorm:"index"`
+	SourceURL  string `json:"source_url"`
 
-	// Basic Info
-	Title        string `json:"title"`
-	Slug         string `json:"slug" gorm:"uniqueIndex"` // need to be unique
-	VehicleClass string `json:"vehicle_class"`           // e.g., Car, Motorbike
-	Category     string `json:"category"`                // e.g., Cabrio, Limousine
-	Condition    string `json:"condition"`               // New, Used
+	Slug  string `json:"slug" gorm:"uniqueIndex"`
+	Title string `json:"title" gorm:"index"`
 
-	// location
+	// Make & Model
+	Make         string `json:"make" gorm:"index:idx_make_model,priority:1"`
+	Model        string `json:"model" gorm:"index:idx_make_model,priority:2"`
+	ModelVersion string `json:"model_version" gorm:"index"`
+
+	VehicleClass string `json:"vehicle_class" gorm:"index"`
+	Category     string `json:"category" gorm:"index"`
+	Condition    string `json:"condition" gorm:"index"`
+
+	// Location
 	City    string `json:"city" gorm:"index"`
 	ZipCode string `json:"zip_code" gorm:"index"`
 	Country string `json:"country" gorm:"index"`
 
 	// Pricing
-	Price            float64 `json:"price" gorm:"index"`
-	DiscountPrice    float64 `json:"discountPrice" gorm:"index"`
-	Currency         string  `json:"currency" gorm:"default:'EUR'"`
-	PriceRatingLabel string  `json:"price_rating_label"`
+	Price         float64 `json:"price" gorm:"index"`
+	DiscountPrice float64 `json:"discount_price" gorm:"index"`
+	Currency      string  `json:"currency" gorm:"default:EUR"`
 
-	// Core Attributes
+	// Registration & Mileage
 	Year              int       `json:"year" gorm:"index"`
-	FirstRegistration time.Time `json:"first_registration"`
+	FirstRegistration time.Time `json:"first_registration" gorm:"index"`
 	Mileage           int       `json:"mileage" gorm:"index"`
-	EngineType        string    `json:"engine_type"` // e.g., Hybrid, Diesel, Petrol, Electric
-	Transmission      string    `json:"transmission"`
-	BodyType          string    `json:"body_type"`
-	Displacement      int       `json:"displacement"` // in ccm
-	PowerHP           int       `json:"power_hp"`
-	PowerKW           int       `json:"power_kw"`
-	FuelType          string    `json:"fuel_type"` // e.g., Diesel, Petrol, Electric
-	Color             string    `json:"color"`
-	Doors             int       `json:"doors"`
-	Seats             int       `json:"seats"`
-	Gearbox           string    `json:"gearbox"` // manual, automatic
 
-	// Features & History
-	Features               StringArray `json:"features" gorm:"type:jsonb"` // JSON array of features
-	DamageUnrepaired       bool        `json:"damage_unrepaired"`
-	Roadworthy             bool        `json:"roadworthy"`
-	AccidentDamaged        bool        `json:"accident_damaged"`
-	NumberOfPreviousOwners int         `json:"number_of_previous_owners"`
-	Warranty               bool        `json:"warranty"`
+	// Technical Specs
+	FuelType     string `json:"fuel_type" gorm:"index"`
+	Transmission string `json:"transmission" gorm:"index"`
+	EngineType   string `json:"engine_type" gorm:"index"`
 
-	// Emissions & Consumption
-	EmissionClass       string  `json:"emission_class"` // Euro 6d
-	CO2Emission         int     `json:"co2_emission"`   // g/km
-	ConsumptionCombined float64 `json:"consumption_combined"`
-	ConsumptionCity     float64 `json:"consumption_city"`
-	ConsumptionHighway  float64 `json:"consumption_highway"`
+	PowerHP      int `json:"power_hp"`
+	PowerKW      int `json:"power_kw"`
+	Displacement int `json:"displacement"`
+
+	Doors int `json:"doors" gorm:"index"`
+	Seats int `json:"seats" gorm:"index"`
+
+	// Colors & Interior
+	ExteriorColor    string `json:"exterior_color" gorm:"index"`
+	InteriorColor    string `json:"interior_color" gorm:"index"`
+	InteriorMaterial string `json:"interior_material" gorm:"index"`
+
+	// Ownership
+	PreviousOwners int `json:"previous_owners" gorm:"index"`
+
+	// Emissions
+	CO2Emission   int    `json:"co2_emission" gorm:"index"`
+	EmissionClass string `json:"emission_class" gorm:"index"`
+
+	// Safety Features (BOOLEAN = FAST FILTER)
+	ABS                    bool `json:"abs" gorm:"index"`
+	ESP                    bool `json:"esp" gorm:"index"`
+	TractionControl        bool `json:"traction_control" gorm:"index"`
+	EmergencyBrakeAssist   bool `json:"emergency_brake_assist" gorm:"index"`
+	BlindSpotAssist        bool `json:"blind_spot_assist" gorm:"index"`
+	LaneAssist             bool `json:"lane_assist" gorm:"index"`
+	TrafficSignRecognition bool `json:"traffic_sign_recognition" gorm:"index"`
+	ISOFIX                 bool `json:"isofix" gorm:"index"`
+
+	// Comfort
+	HeatedSteeringWheel bool `json:"heated_steering_wheel"`
+	StartStopSystem     bool `json:"start_stop_system"`
+	HeatedSeats         bool `json:"heated_seats"`
+	ElectricSeats       bool `json:"electric_seats"`
+	SportSeats          bool `json:"sport_seats"`
+
+	// Exterior Features
+	FogLights          bool `json:"fog_lights"`
+	AdaptiveHeadlights bool `json:"adaptive_headlights"`
+	RainSensor         bool `json:"rain_sensor"`
+
+	// Infotainment
+	Radio            bool `json:"radio"`
+	NavigationSystem bool `json:"navigation_system"`
+	VoiceControl     bool `json:"voice_control"`
+	Bluetooth        bool `json:"bluetooth"`
+	USB              bool `json:"usb"`
+	AppleCarPlay     bool `json:"apple_carplay"`
+	AndroidAuto      bool `json:"android_auto"`
 
 	// Seller
-	SellerType    string `json:"seller_type"` // dealer | private
-	SellerName    string `json:"seller_name"`
+	SellerType    string `json:"seller_type" gorm:"index"`
+	SellerName    string `json:"seller_name" gorm:"index"`
 	SellerCity    string `json:"seller_city"`
 	SellerCountry string `json:"seller_country"`
 
 	// Media
-	Images StringArray `json:"images" gorm:"type:jsonb"` // JSON array of image URLs
+	Images utils.StringArray `json:"images" gorm:"type:json"`
 
-	// Metadata
-	ExternalID string `json:"external_id" gorm:"index"` // inner_id from source
-	SourceURL  string `json:"source_url"`
-
-	ListingStatus string `json:"listing_status"` // active, sold, reserved
+	// Listing
+	ListingStatus string `json:"listing_status" gorm:"index"`
 }

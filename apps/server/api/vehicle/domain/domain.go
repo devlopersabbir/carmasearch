@@ -29,5 +29,5 @@ type Service interface {
 	DeleteVehicle(id uint) error
 	ListVehicles(limit, offset int) ([]core.Vehicle, int64, error)
 	// Placeholder for ElasticSearch integration
-	SearchVehicles(query string) ([]core.Vehicle, error)
+	SearchVehicles(filters map[string]interface{}) ([]core.Vehicle, error)
 }

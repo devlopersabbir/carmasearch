@@ -2,6 +2,7 @@ package vehicle
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/carmasearch/carma-server/api/vehicle/core"
 	"github.com/carmasearch/carma-server/api/vehicle/domain"
@@ -22,7 +23,6 @@ func NewService(repo domain.Repository) domain.Service {
 }
 
 func (s *service) CreateVehicle(vehicle *core.Vehicle) error {
-	// Add validation logic here if needed
 	if vehicle.Title == "" {
 		return errors.New("title is required")
 	}
@@ -72,9 +72,10 @@ func (s *service) ListVehicles(limit, offset int) ([]core.Vehicle, int64, error)
 	return s.repo.List(limit, offset)
 }
 
-func (s *service) SearchVehicles(query string) ([]core.Vehicle, error) {
-	// TODO: Implement ElasticSearch logic
-	// For now, return empty or basic DB search if desired,
-	// but user specifically asked for Elastic later, so we keep this placeholder.
+func (s *service) SearchVehicles(filters map[string]interface{}) ([]core.Vehicle, error) {
+	// TODO: Implement ElasticSearch logic from calling elastic module
+	// github.com/carmasearch/carma-server/internal/elastic
+	//
+	fmt.Println("service: ", filters)
 	return nil, errors.New("search not implemented yet")
 }

@@ -1,50 +1,37 @@
 package elastic
 
 import (
-	"encoding/json"
-	"io"
-
-	"github.com/carmasearch/carma-server/internal/elastic/core"
+	"github.com/carmasearch/carma-server/api/vehicle/core"
+	"github.com/carmasearch/carma-server/internal/elastic/domain"
+	"github.com/elastic/go-elasticsearch/v7"
+	"gorm.io/gorm"
 )
 
-func parseCompareResults(body io.Reader) ([]core.VehicleCompareResult, error) {
-	var raw struct {
-		Hits struct {
-			Hits []struct {
-				Score  float64 `json:"_score"`
-				Source struct {
-					ID      uint    `json:"id"`
-					Title   string  `json:"title"`
-					Make    string  `json:"make"`
-					Model   string  `json:"model"`
-					Year    int     `json:"year"`
-					Price   float64 `json:"price"`
-					Mileage int     `json:"mileage"`
-					Color   int     `json:"color"`
-					City    string  `json:"city"`
-				} `json:"_source"`
-			} `json:"hits"`
-		} `json:"hits"`
-	}
+type vehicleService struct {
+	service   domain.VehicleCompareService
+	repo      domain.VehicleCompareRepository
+	esClient  *elasticsearch.Client
+	indexName string
+	db        *gorm.DB
+}
 
-	if err := json.NewDecoder(body).Decode(&raw); err != nil {
+func (s *vehicleService) CompareVehicle(input *core.Vehicle) ([]core.Vehicle, error) {
+
+	// 1️⃣ Query Elasticsearch for best matches
+	ids, err := s.service.SearchSimilarVehicles(input)
+	if err != nil {
 		return nil, err
 	}
 
-	results := make([]core.VehicleCompareResult, 0)
-	for _, h := range raw.Hits.Hits {
-		results = append(results, core.VehicleCompareResult{
-			ID:      h.Source.ID,
-			Title:   h.Source.Title,
-			Make:    h.Source.Make,
-			Model:   h.Source.Model,
-			Year:    h.Source.Year,
-			Price:   h.Source.Price,
-			Mileage: h.Source.Mileage,
-			City:    h.Source.City,
-			Score:   h.Score,
-		})
+	if len(ids) == 0 {
+		return []core.Vehicle{}, nil
 	}
 
-	return results, nil
+	// 2️⃣ Fetch full vehicles from DB in ranked order
+	vehicles, err := s.repo.GetVehiclesByIDs(ids)
+	if err != nil {
+		return nil, err
+	}
+
+	return vehicles, nil
 }
