@@ -11,16 +11,22 @@ import (
 )
 
 type vehicleService struct {
-	service   domain.VehicleCompareService
-	repo      domain.VehicleCompareRepository
 	esClient  *elasticsearch.Client
 	indexName string
 	db        *gorm.DB
 }
 
+func NewVehicleCompareService(esClient *elasticsearch.Client, indexName string, db *gorm.DB) domain.VehicleCompareService {
+	return &vehicleService{
+		esClient:  esClient,
+		indexName: indexName,
+		db:        db,
+	}
+}
+
 func (s *vehicleService) CompareVehicle(input *esCore.VehicleSearchQuery) ([]core.Vehicle, error) {
 	log.Println("=========log=========", input)
-	ids, err := s.service.SearchSimilarVehicles(input)
+	ids, err := s.SearchSimilarVehicles(input)
 	log.Println("=========ids=========", ids)
 	if err != nil {
 		return nil, err
@@ -30,7 +36,7 @@ func (s *vehicleService) CompareVehicle(input *esCore.VehicleSearchQuery) ([]cor
 		return []core.Vehicle{}, nil
 	}
 
-	vehicles, err := s.repo.GetVehiclesByIDs(ids)
+	vehicles, err := s.GetVehiclesByIDs(ids)
 	if err != nil {
 		return nil, err
 	}
