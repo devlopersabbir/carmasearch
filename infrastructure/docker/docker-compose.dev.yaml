@@ -132,24 +132,6 @@ services:
     networks:
       - carmasearch
 
-  kibana:
-    image: docker.elastic.co/kibana/kibana:7.5.2
-    container_name: kibana
-    profiles:
-      - dev
-      - prod
-      - kibana
-    ports:
-      - "5601:5601"
-    environment:
-      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
-    depends_on:
-      elasticsearch:
-        condition: service_healthy
-    restart: unless-stopped
-    networks:
-      - carmasearch
-
 networks:
   carmasearch:
     driver: bridge
