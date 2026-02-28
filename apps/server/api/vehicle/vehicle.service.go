@@ -1,12 +1,16 @@
 package vehicle
 
 import (
+	"context"
 	"errors"
-	"fmt"
 
 	"github.com/carmasearch/carma-server/api/vehicle/core"
 	"github.com/carmasearch/carma-server/api/vehicle/domain"
 	"github.com/carmasearch/carma-server/arch/network"
+
+	es "github.com/carmasearch/carma-server/internal/elastic"
+	esRepo "github.com/carmasearch/carma-server/internal/elastic"
+	esCore "github.com/carmasearch/carma-server/internal/elastic/core"
 	"github.com/carmasearch/carma-server/internal/utils"
 )
 
@@ -22,7 +26,7 @@ func NewService(repo domain.Repository) domain.Service {
 	}
 }
 
-func (s *service) CreateVehicle(vehicle *core.Vehicle) error {
+func (s *service) CreateVehicle(c context.Context, vehicle *core.Vehicle) error {
 	if vehicle.Title == "" {
 		return errors.New("title is required")
 	}
@@ -39,7 +43,14 @@ func (s *service) CreateVehicle(vehicle *core.Vehicle) error {
 	}
 
 	vehicle.Slug = slug
-	return s.repo.Create(vehicle)
+	e := s.repo.Create(c, vehicle)
+	if e != nil {
+		return e
+	}
+	// Index in Elasticsearch asynchronously
+	go es.IndexVehicle(vehicle)
+
+	return nil
 }
 
 func (s *service) GetVehicle(id uint) (*core.Vehicle, error) {
@@ -72,10 +83,24 @@ func (s *service) ListVehicles(limit, offset int) ([]core.Vehicle, int64, error)
 	return s.repo.List(limit, offset)
 }
 
-func (s *service) SearchVehicles(filters map[string]interface{}) ([]core.Vehicle, error) {
-	// TODO: Implement ElasticSearch logic from calling elastic module
-	// github.com/carmasearch/carma-server/internal/elastic
-	//
-	fmt.Println("service: ", filters)
-	return nil, errors.New("search not implemented yet")
+func (s *service) SearchAndCompare(
+	c context.Context,
+	req *esCore.VehicleSearchQuery,
+) (int64, []*core.Vehicle, error) {
+
+	ids, total, err := esRepo.Search(c, req)
+	if err != nil {
+		return 0, nil, err
+	}
+
+	if len(ids) == 0 {
+		return total, []*core.Vehicle{}, nil
+	}
+
+	vehicles, err := s.repo.FindByIDs(ids)
+	if err != nil {
+		return 0, nil, err
+	}
+
+	return total, vehicles, nil
 }

@@ -1,7 +1,6 @@
 package vehicle
 
 import (
-	"log"
 	"net/http"
 	"strconv"
 
@@ -39,7 +38,7 @@ func (c *vehicleController) create(ctx *gin.Context) {
 		return
 	}
 
-	if err := c.service.CreateVehicle(&vehicle); err != nil {
+	if err := c.service.CreateVehicle(ctx.Request.Context(), &vehicle); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -83,49 +82,43 @@ func (c *vehicleController) list(ctx *gin.Context) {
 	})
 }
 
-func (c *vehicleController) search(ctx *gin.Context) {
-	// get all query params without defined key
-	// exmaple /search?version=1&color=red&price=100000
-	// returns map[string][]string
-	rowQueries := ctx.Request.URL.Query()
-	filters := make(map[string]interface{})
+func (cn *vehicleController) search(c *gin.Context) {
+	var req esCore.VehicleSearchQuery
 
-	for key, values := range rowQueries {
-		if len(values) == 1 {
-			filters[key] = values[0]
-		} else {
-			// support multi-value filters like ?color=red&color=blue
-			filters[key] = values
+	if err := c.ShouldBindQuery(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if req.Page < 1 {
+		req.Page = 1
+	}
+
+	if req.PageSize < 1 || req.PageSize > 100 {
+		req.PageSize = 20
+	}
+
+	total, vehicles, err := cn.service.SearchAndCompare(
+		c.Request.Context(),
+		&req,
+	)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	result := make([]core.Vehicle, 0, len(vehicles))
+	for _, v := range vehicles {
+		if v != nil {
+			result = append(result, *v)
 		}
 	}
-	vehicles, err := c.service.SearchVehicles(filters)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
 
-	ctx.JSON(http.StatusOK, vehicles)
-}
-
-func (c *vehicleController) compare(ctx *gin.Context) {
-	var input esCore.VehicleSearchQuery
-
-	// Scraper sends full vehicle JSON here
-	if err := ctx.ShouldBindJSON(&input); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	log.Println("there are no error")
-	vehicles, err := c.esService.CompareVehicle(&input)
-	log.Println("vehicless......")
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	ctx.JSON(http.StatusOK, gin.H{
-		"data":  vehicles,
-		"count": len(vehicles),
+	c.JSON(http.StatusOK, esCore.VehicleSearchQueryResponse{
+		Total:    uint64(total),
+		Page:     req.Page,
+		Pagesize: req.PageSize,
+		Vehicles: result,
 	})
 }
 
@@ -136,6 +129,5 @@ func (c *vehicleController) MountRoutes(group *gin.RouterGroup) {
 		vehicleGroup.GET("/:id", c.get)
 		vehicleGroup.GET("", c.list)
 		vehicleGroup.GET("/search", c.search)
-		vehicleGroup.POST("/compare", c.compare)
 	}
 }

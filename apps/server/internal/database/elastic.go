@@ -1,12 +1,10 @@
 package database
 
 import (
-	"context"
 	"log"
 
 	"github.com/carmasearch/carma-server/internal/config"
 	"github.com/elastic/go-elasticsearch/v7"
-	"github.com/elastic/go-elasticsearch/v7/esapi"
 )
 
 var ESClient *elasticsearch.Client
@@ -36,13 +34,19 @@ func ESClientConnection(config *config.ElasticConfig) {
 }
 
 func ESCreateIndexIfNotExist() {
-	_, err := esapi.IndicesExistsRequest{
-		Index: []string{ESIndexName},
-	}.Do(context.Background(), ESClient)
+	res, err := ESClient.Indices.Create(ESIndexName)
 
 	if err != nil {
-		ESClient.Indices.Create(ESIndexName)
-		log.Printf("✅ Index %s created", ESIndexName)
+		log.Fatalf("failed creating index: %v", err)
 	}
-	log.Printf("✅ Index %s already exists", ESIndexName)
+
+	defer res.Body.Close()
+
+	log.Printf("Status code::::::::::%d", res.StatusCode)
+	if res.StatusCode == 400 {
+		log.Println("Index already created, skip now.")
+		return
+	}
+
+	log.Printf("✅ Index %s created", ESIndexName)
 }

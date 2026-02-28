@@ -1,12 +1,10 @@
 package vehicle
 
 import (
-	"encoding/json"
-	"strings"
+	"context"
 
 	"github.com/carmasearch/carma-server/api/vehicle/core"
 	"github.com/carmasearch/carma-server/api/vehicle/domain"
-	esClient "github.com/carmasearch/carma-server/internal/database"
 	"gorm.io/gorm"
 )
 
@@ -20,21 +18,8 @@ func NewRepository(db *gorm.DB) domain.Repository {
 	}
 }
 
-func (r *repository) Create(vehicle *core.Vehicle) error {
-	// create
-	if err := r.db.Create(vehicle).Error; err != nil {
-		return err
-	}
-	data, _ := json.Marshal(vehicle)
-	_, err := esClient.ESClient.Index(
-		esClient.ESIndexName,
-		strings.NewReader(string(data)),
-		esClient.ESClient.Index.WithRefresh("true"),
-	)
-	if err != nil {
-		panic(err)
-	}
-	return nil
+func (r *repository) Create(c context.Context, v *core.Vehicle) error {
+	return r.db.Create(v).Error
 }
 
 func (r *repository) FindByID(id uint) (*core.Vehicle, error) {
@@ -43,6 +28,22 @@ func (r *repository) FindByID(id uint) (*core.Vehicle, error) {
 		return nil, err
 	}
 	return &vehicle, nil
+}
+
+func (r *repository) FindByIDs(ids []uint64) ([]*core.Vehicle, error) {
+	var vehicles []*core.Vehicle
+
+	if len(ids) == 0 {
+		return vehicles, nil
+	}
+
+	if err := r.db.
+		Where("id IN ?", ids).
+		Find(&vehicles).Error; err != nil {
+		return nil, err
+	}
+
+	return vehicles, nil
 }
 
 // Find by Slug

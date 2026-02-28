@@ -1,5 +1,7 @@
 package core
 
+import "github.com/carmasearch/carma-server/api/vehicle/core"
+
 type VehicleSearchQuery struct {
 	// Basic vehicle Info
 	VehicleID    *string  `json:"vehicle_id"`
@@ -61,8 +63,17 @@ type VehicleSearchQuery struct {
 	AndroidAuto      *bool `json:"android_auto"`
 
 	// Meta
-	Page      int    `json:"page"`
-	Limit     int    `json:"limit"`
-	SortBy    string `json:"sort_by"`    // price, registration, mileage
-	SortOrder string `json:"sort_order"` // asc, desc
+	Page      int    `form:"page,default=1"`
+	PageSize  int    `form:"page_size,default=20"`
+	SortBy    string `form:"sort_by,default=created_at"`
+	SortOrder string `form:"sort_order,default=desc"`
+	// required for elastic
+	Query string `form:"query"`
+}
+
+type VehicleSearchQueryResponse struct {
+	Total    uint64         `json:"total"`
+	Page     int            `json:"page"`
+	Pagesize int            `json:"page_size"`
+	Vehicles []core.Vehicle `json:"vehicles"`
 }

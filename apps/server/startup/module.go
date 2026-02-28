@@ -12,8 +12,6 @@ import (
 	"github.com/carmasearch/carma-server/arch/network"
 	"github.com/carmasearch/carma-server/arch/redis"
 	"github.com/carmasearch/carma-server/internal/config"
-	"github.com/carmasearch/carma-server/internal/database"
-	"github.com/carmasearch/carma-server/internal/elastic"
 	esDomain "github.com/carmasearch/carma-server/internal/elastic/domain"
 	"gorm.io/gorm"
 )
@@ -67,7 +65,6 @@ func NewModule(ctx context.Context, env *config.Config, db *gorm.DB, store redis
 		// userservice
 		// auth service
 		// list of serivce
-		VehicleService:        vehicle.NewService(vehicle.NewRepository(db)),
-		VehicleCompareService: elastic.NewVehicleCompareService(database.ESClient, database.ESIndexName, db),
+		VehicleService: vehicle.NewService(vehicle.NewRepository(db)),
 	}
 }
