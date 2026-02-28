@@ -7,6 +7,7 @@ import (
 
 type VehicleCompareRepository interface {
 	GetVehiclesByIDs(ids []uint) ([]core.Vehicle, error)
+	IndexVehcile(vehicle *core.Vehicle)
 }
 
 type VehicleCompareService interface {

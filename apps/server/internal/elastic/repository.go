@@ -4,10 +4,41 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"log"
+	"strconv"
 
 	"github.com/carmasearch/carma-server/api/vehicle/core"
+	es "github.com/carmasearch/carma-server/internal/database"
 	esCore "github.com/carmasearch/carma-server/internal/elastic/core"
 )
+
+
+func IndexVehcile(t *core.Vehicle) {
+	jsonBody, err := json.Marshal(t)
+	if err != nil {
+		log.Println("marshal error:", err)
+		return
+	}
+
+	res, err := es.ESClient.Index(
+		"todos",
+		bytes.NewReader(jsonBody),
+		es.ESClient.Index.WithDocumentID(strconv.Itoa(int(t.ID))), // VERY IMPORTANT
+		es.ESClient.Index.WithRefresh("true"),                     // force refresh so you can see immediately
+	)
+	if err != nil {
+		log.Println("index request failed:", err)
+		return
+	}
+	defer res.Body.Close()
+
+	if res.IsError() {
+		log.Println("indexing error:", res.String())
+		return
+	}
+
+	log.Println("indexed successfully:", t.ID)
+}
 
 func (s *vehicleService) SearchSimilarVehicles(input *esCore.VehicleSearchQuery) ([]uint, error) {
 

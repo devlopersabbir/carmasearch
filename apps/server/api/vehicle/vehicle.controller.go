@@ -39,7 +39,7 @@ func (c *vehicleController) create(ctx *gin.Context) {
 		return
 	}
 
-	if err := c.service.CreateVehicle(&vehicle); err != nil {
+	if err := c.service.CreateVehicle(ctx, &vehicle); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

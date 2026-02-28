@@ -2,10 +2,11 @@ package domain
 
 import (
 	"github.com/carmasearch/carma-server/api/vehicle/core"
+	"github.com/gin-gonic/gin"
 )
 
 type Repository interface {
-	Create(vehicle *core.Vehicle) error
+	Create(c *gin.Context, vehicle *core.Vehicle) error
 	FindByID(id uint) (*core.Vehicle, error)
 	FindBySlug(slug string) (*core.Vehicle, error)
 	Update(vehicle *core.Vehicle) error
@@ -15,7 +16,7 @@ type Repository interface {
 }
 
 type Service interface {
-	CreateVehicle(vehicle *core.Vehicle) error
+	CreateVehicle(c *gin.Context, vehicle *core.Vehicle) error
 	GetVehicle(id uint) (*core.Vehicle, error)
 	UpdateVehicle(vehicle *core.Vehicle) error
 	DeleteVehicle(id uint) error

@@ -3,26 +3,31 @@ package vehicle
 import (
 	"errors"
 	"fmt"
+	"net/http"
 
 	"github.com/carmasearch/carma-server/api/vehicle/core"
 	"github.com/carmasearch/carma-server/api/vehicle/domain"
 	"github.com/carmasearch/carma-server/arch/network"
+	esDomain "github.com/carmasearch/carma-server/internal/elastic/domain"
 	"github.com/carmasearch/carma-server/internal/utils"
+	"github.com/gin-gonic/gin"
 )
 
 type service struct {
 	network.BaseService
-	repo domain.Repository
+	repo   domain.Repository
+	esRepo esDomain.VehicleCompareRepository
 }
 
-func NewService(repo domain.Repository) domain.Service {
+func NewService(repo domain.Repository, esRepo esDomain.VehicleCompareRepository) domain.Service {
 	return &service{
 		BaseService: network.NewBaseService(),
 		repo:        repo,
+		esRepo: esRepo,
 	}
 }
 
-func (s *service) CreateVehicle(vehicle *core.Vehicle) error {
+func (s *service) CreateVehicle(c *gin.Context, vehicle *core.Vehicle) error {
 	if vehicle.Title == "" {
 		return errors.New("title is required")
 	}
@@ -39,7 +44,14 @@ func (s *service) CreateVehicle(vehicle *core.Vehicle) error {
 	}
 
 	vehicle.Slug = slug
-	return s.repo.Create(vehicle)
+	if err := s.repo.Create(c, vehicle); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create todo"})
+		return nil
+	}
+	// Index in Elasticsearch asynchronously
+	go s.esRepo.IndexVehcile(vehicle)
+
+	return nil
 }
 
 func (s *service) GetVehicle(id uint) (*core.Vehicle, error) {
