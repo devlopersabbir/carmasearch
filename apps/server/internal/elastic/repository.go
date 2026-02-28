@@ -22,8 +22,8 @@ func IndexVehicle(s *core.Vehicle) {
 	res, err := es.ESClient.Index(
 		es.ESIndexName,
 		bytes.NewReader(jsonBody),
-		es.ESClient.Index.WithDocumentID(strconv.Itoa(int(s.ID))), // VERY IMPORTANT
-		es.ESClient.Index.WithRefresh("true"),                     // force refresh so you can see immediately
+		es.ESClient.Index.WithDocumentID(strconv.Itoa(int(s.ID))),
+		es.ESClient.Index.WithRefresh("true"),
 	)
 	if err != nil {
 		log.Println("index request failed:", err)
