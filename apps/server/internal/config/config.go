@@ -32,6 +32,17 @@ func LoadEnv(path string) (*Config, error) {
 			MaxIdleConns:    GetIntEnv("DB_MAX_IDLE_CONNS", 5),
 			ConnMaxLifetime: GetDurationEnv("DB_CONN_MAX_LIFETIME", 5*time.Minute),
 		},
+		// Database: DatabaseConfig{
+		// 	Host:            GetEnv("DB_HOST", "carma.postgres.database.azure.com"),
+		// 	Port:            GetEnv("DB_PORT", "5431"),
+		// 	User:            GetEnv("DB_USER", "carmaadmin"),
+		// 	Password:        GetEnv("DB_PASSWORD", "Hosthunter1221!."),
+		// 	DBName:          GetEnv("DB_NAME", "postgres"),
+		// 	SSLMode:         GetEnv("DB_SSLMODE", "enable"),
+		// 	MaxOpenConns:    GetIntEnv("DB_MAX_OPEN_CONNS", 25),
+		// 	MaxIdleConns:    GetIntEnv("DB_MAX_IDLE_CONNS", 5),
+		// 	ConnMaxLifetime: GetDurationEnv("DB_CONN_MAX_LIFETIME", 5*time.Minute),
+		// },
 		Redis: RedisConfig{
 			Addr:     GetEnv("REDIS_ADDR", "localhost:6379"),
 			Password: GetEnv("REDIS_PASSWORD", ""),

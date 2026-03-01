@@ -1,12 +1,11 @@
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
-from routers.scrape import router as scrape_router
-from routers.internal import router as internal_router
+from pydantic import BaseModel
 
 app = FastAPI(
-    title="CarMasearch Scraper API",
+    title="Carmasearch Scraper API",
     version="1.0.0",
-    description="CarMasearch Scraper API"
+    description="Carmasearch Scraper API"
 )
 
 @app.get("/")
@@ -16,5 +15,10 @@ async def root():
     }
     return JSONResponse(content=res, status_code=200)
 
-app.include_router(internal_router)
-app.include_router(scrape_router)
+class RequestBody(BaseModel):
+    url: str
+
+@app.post("/")
+async def scrape(req: RequestBody):
+    print(req)
+    return req
