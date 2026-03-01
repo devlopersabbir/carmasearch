@@ -25,7 +25,7 @@ func NewController(
 	esService esDomain.VehicleCompareService,
 ) network.Controller {
 	return &vehicleController{
-		BaseController: network.NewBaseController("/api/v1", authProvider, authorizeProvider),
+		BaseController: network.NewBaseController("/api", authProvider, authorizeProvider),
 		service:        service,
 		esService:      esService,
 	}
@@ -122,12 +122,25 @@ func (cn *vehicleController) search(c *gin.Context) {
 	})
 }
 
-func (c *vehicleController) MountRoutes(group *gin.RouterGroup) {
-	vehicleGroup := group.Group("vehicles")
+func (cn *vehicleController) search2(c *gin.Context) {
+
+}
+
+func (cn *vehicleController) MountRoutes(group *gin.RouterGroup) {
+	v1 := group.Group("/v1/vehicles")
 	{
-		vehicleGroup.POST("", c.create)
-		vehicleGroup.GET("/:id", c.get)
-		vehicleGroup.GET("", c.list)
-		vehicleGroup.GET("/search", c.search)
+		v1.POST("", cn.create)
+		v1.GET("/:id", cn.get)
+		v1.GET("", cn.list)
+		v1.GET("/search", cn.search)
+	}
+	v2 := group.Group("/v2/vehicles")
+	{
+		v2.GET("", func(c *gin.Context) {
+			c.JSON(http.StatusOK, gin.H{
+				"message": "Hello World from v2",
+			})
+		})
+		v2.POST("/search", cn.search2)
 	}
 }

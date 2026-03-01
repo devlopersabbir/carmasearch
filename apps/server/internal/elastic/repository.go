@@ -17,6 +17,7 @@ func Search2(c context.Context, body *core.Vehicle) ([]uint64, int64, error) {
 }
 
 func Search(ctx context.Context, req *esCore.VehicleSearchQuery) ([]uint64, int64, error) {
+	log.Println("search request::::::::::::::::", &req)
 	if es.ESClient == nil {
 		return nil, 0, nil
 	}
