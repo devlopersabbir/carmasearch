@@ -9,11 +9,11 @@ import (
 
 type VehicleCompareRepository interface {
 	IndexVehcile(v *core.Vehicle)
-	Search(ctx context.Context, req *esCore.VehicleSearchQuery) ([]uint64, int64, error)
+	Search(ctx context.Context, req *esCore.VehicleSearchAndCompare) ([]uint64, int64, error)
 	GetVehiclesByIDs(ids []uint64) ([]core.Vehicle, error)
 }
 
 type VehicleCompareService interface {
-	CompareVehicle(vehicle *esCore.VehicleSearchQuery) ([]core.Vehicle, error)
-	SearchSimilarVehicles(input *esCore.VehicleSearchQuery) ([]uint64, error)
+	CompareVehicle(vehicle *esCore.VehicleSearchAndCompare) ([]core.Vehicle, error)
+	SearchSimilarVehicles(input *esCore.VehicleSearchAndCompare) ([]uint64, error)
 }

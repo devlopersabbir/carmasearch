@@ -9,6 +9,7 @@ import (
 	"github.com/carmasearch/carma-server/arch/network"
 	esCore "github.com/carmasearch/carma-server/internal/elastic/core"
 	esDomain "github.com/carmasearch/carma-server/internal/elastic/domain"
+	"github.com/carmasearch/carma-server/internal/scraper"
 	"github.com/gin-gonic/gin"
 )
 
@@ -83,24 +84,41 @@ func (c *vehicleController) list(ctx *gin.Context) {
 }
 
 func (cn *vehicleController) search(c *gin.Context) {
-	var req esCore.VehicleSearchQuery
+	var body esCore.CompareRequest
+	var query esCore.CompareRequestQuery
 
-	if err := c.ShouldBindQuery(&req); err != nil {
+	// Bind JSON body
+	if err := c.ShouldBindJSON(&body); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	if req.Page < 1 {
-		req.Page = 1
+	// Bind query params
+	if err := c.ShouldBindQuery(&query); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 
-	if req.PageSize < 1 || req.PageSize > 100 {
-		req.PageSize = 20
+	// Normalize pagination
+	if query.Page < 1 {
+		query.Page = 1
+	}
+	if query.PageSize < 1 || query.PageSize > 100 {
+		query.PageSize = 20
 	}
 
+	// 1. Call Scraper using body.Url
+	if err := scraper.Scrape(body.Url); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	// 2. Build VehicleSearchAndCompare
+	searchAndQuery := buildVehicleSearchAndCompare(&body, &query)
+
+	// 3. Call service
 	total, vehicles, err := cn.service.SearchAndCompare(
 		c.Request.Context(),
-		&req,
+		searchAndQuery,
 	)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -116,8 +134,8 @@ func (cn *vehicleController) search(c *gin.Context) {
 
 	c.JSON(http.StatusOK, esCore.VehicleSearchQueryResponse{
 		Total:    uint64(total),
-		Page:     req.Page,
-		Pagesize: req.PageSize,
+		Page:     query.Page,
+		Pagesize: query.PageSize,
 		Vehicles: result,
 	})
 }
@@ -132,7 +150,7 @@ func (cn *vehicleController) MountRoutes(group *gin.RouterGroup) {
 		v1.POST("", cn.create)
 		v1.GET("/:id", cn.get)
 		v1.GET("", cn.list)
-		v1.GET("/search", cn.search)
+		v1.POST("/search", cn.search)
 	}
 	v2 := group.Group("/v2/vehicles")
 	{

@@ -2,7 +2,18 @@ package core
 
 import "github.com/carmasearch/carma-server/api/vehicle/core"
 
-type VehicleSearchQuery struct {
+type CompareRequest struct {
+	Url string `json:"url"`
+}
+
+type CompareRequestQuery struct {
+	Page      int    `form:"page,default=1"`
+	PageSize  int    `form:"page_size,default=20"`
+	SortBy    string `form:"sort_by,default=created_at"`
+	SortOrder string `form:"sort_order,default=desc"`
+}
+
+type VehicleSearchAndCompare struct {
 	// Basic vehicle Info
 	VehicleID    *string  `json:"vehicle_id"`
 	ListingURL   *string  `json:"listing_url"`
@@ -61,14 +72,7 @@ type VehicleSearchQuery struct {
 	USB              *bool `json:"usb"`
 	AppleCarPlay     *bool `json:"apple_carplay"`
 	AndroidAuto      *bool `json:"android_auto"`
-
-	// Meta
-	Page      int    `form:"page,default=1"`
-	PageSize  int    `form:"page_size,default=20"`
-	SortBy    string `form:"sort_by,default=created_at"`
-	SortOrder string `form:"sort_order,default=desc"`
-	// required for elastic
-	Query string `form:"query"`
+	CompareRequestQuery
 }
 
 type VehicleSearchQueryResponse struct {

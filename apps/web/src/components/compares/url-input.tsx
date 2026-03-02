@@ -2,7 +2,7 @@
 import { LinkIcon } from "lucide-react";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
-import { useAdvanceOptionStore } from "../shared/models/compare/_store/advance-option.store";
+import { useAdvanceOptionStore } from "@/components/shared/models/compare/_store/advance-option.store";
 
 export default function UrlInput() {
   const { vehicleUrl, isSearching, setVehicleUrl } = useAdvanceOptionStore();

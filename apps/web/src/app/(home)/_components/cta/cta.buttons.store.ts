@@ -1,9 +1,22 @@
 import { create } from "zustand";
+import { CompareVehicles } from "../../actions/compare-vehicles";
+import { useAdvanceOptionStore } from "@/components/shared/models/compare/_store/advance-option.store";
 
 export type CtaButtonsStore = {
   handleCompareClick: () => void;
 };
 
 export const useCtaButtonsStore = create<CtaButtonsStore>((set) => ({
-  handleCompareClick: () => set({}),
+  handleCompareClick: async () => {
+    const query = useAdvanceOptionStore();
+    try {
+      const res = await CompareVehicles({
+        ...query,
+      });
+
+      console.log("res: ", res);
+    } catch (err) {
+      console.log(err);
+    }
+  },
 }));

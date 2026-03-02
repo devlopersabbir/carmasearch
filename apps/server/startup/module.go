@@ -13,6 +13,7 @@ import (
 	"github.com/carmasearch/carma-server/arch/redis"
 	"github.com/carmasearch/carma-server/internal/config"
 	esDomain "github.com/carmasearch/carma-server/internal/elastic/domain"
+	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
@@ -46,6 +47,12 @@ func (m *module) RootMiddlewares() []network.RootMiddleware {
 	return []network.RootMiddleware{
 		coreMW.NewErrorCatcher(), // NOTE this should be the first middleware to catche all errors
 		coreMW.NewNotFound(),
+	}
+}
+
+func (m *module) CorsMiddlewares() []gin.HandlerFunc {
+	return []gin.HandlerFunc{
+		config.CORSMiddleware(),
 	}
 }
 

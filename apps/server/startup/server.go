@@ -38,6 +38,7 @@ func create(env *config.Config) (network.Router, Shutdown) {
 	router := network.NewRouter(env.Server.Environment)
 	router.RegisterValidationParsers(network.CustomTagNameFunc())
 	router.LoadRootMiddlewares(module.RootMiddlewares())
+	router.LoadCorsMiddlewares(module.CorsMiddlewares())
 	router.LoadGroup("", module.Controllers())
 
 	shutdown := func() {

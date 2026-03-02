@@ -85,7 +85,7 @@ func (s *service) ListVehicles(limit, offset int) ([]core.Vehicle, int64, error)
 
 func (s *service) SearchAndCompare(
 	c context.Context,
-	req *esCore.VehicleSearchQuery,
+	req *esCore.VehicleSearchAndCompare,
 ) (int64, []*core.Vehicle, error) {
 
 	ids, total, err := esRepo.Search(c, req)

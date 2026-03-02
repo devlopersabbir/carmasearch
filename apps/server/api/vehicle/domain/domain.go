@@ -26,6 +26,6 @@ type Service interface {
 
 	SearchAndCompare(
 		c context.Context,
-		req *esCore.VehicleSearchQuery,
+		req *esCore.VehicleSearchAndCompare,
 	) (int64, []*core.Vehicle, error)
 }

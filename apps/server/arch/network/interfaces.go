@@ -107,6 +107,8 @@ type BaseRouter interface {
 	RegisterValidationParsers(tagNameFunc validator.TagNameFunc)
 	// load root middlewares
 	LoadRootMiddlewares(middlewares []RootMiddleware)
+	// load cors middlewares
+	LoadCorsMiddlewares(middlewares []gin.HandlerFunc)
 	// start server
 	Start(ip string, port uint16)
 }
@@ -125,6 +127,8 @@ type BaseModule[T any] interface {
 	GetInstance() *T
 	// root middlewares
 	RootMiddlewares() []RootMiddleware
+	// cors middlewares
+	CorsMiddlewares() []gin.HandlerFunc
 	// authentication provider
 	AuthenticationProvider() AuthenticationProvider
 	// authorization provider

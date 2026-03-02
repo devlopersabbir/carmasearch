@@ -1,8 +1,8 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { useCtaButtonsStore } from "./cta.buttons.store";
-import { useCompareModelStore } from "@/components/providers/models/compare-model.store";
 import { toast } from "sonner";
+import { useCompareModelStore } from "@/components/providers/models/compare-model.store";
+import { useCtaButtonsStore } from "./cta.buttons.store";
 
 export default function CtaButtons() {
   const { handleCompareClick } = useCtaButtonsStore();

@@ -1,7 +1,8 @@
 import { create } from "zustand";
 import { AdvanceOptionState } from "./types";
+import { CompareVehicles } from "@/app/(home)/actions/compare-vehicles";
 
-export const useAdvanceOptionStore = create<AdvanceOptionState>((set) => ({
+export const useAdvanceOptionStore = create<AdvanceOptionState>((set, get) => ({
   vehicleUrl: "",
   isSearching: false,
 
@@ -43,11 +44,20 @@ export const useAdvanceOptionStore = create<AdvanceOptionState>((set) => ({
 
   // TODO: handle save and compare function here...
   // TODO: compare api call will be from here...
-  handleSaveAndCompare: () => {
+  handleSaveAndCompare: async () => {
     set({ isSearching: true });
-    setTimeout(() => {
+    // TODO: save query to local storage
+    // TODO: call api to get data
+    const query = get();
+    try {
+      const res = await CompareVehicles({ ...query });
+
+      console.log("res: ", res);
+    } catch (err) {
+      console.log(err);
+    } finally {
       set({ isSearching: false });
-    }, 2000);
+    }
   },
   setSearchResults: <T>(searchResults: T) => {
     console.log(searchResults);

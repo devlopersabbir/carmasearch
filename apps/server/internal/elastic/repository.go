@@ -18,20 +18,12 @@ func Search2(c context.Context, body *core.Vehicle) ([]uint64, int64, error) {
 	return nil, 0, nil
 }
 
-func Search(ctx context.Context, req *esCore.VehicleSearchQuery) ([]uint64, int64, error) {
+func Search(ctx context.Context, req *esCore.VehicleSearchAndCompare) ([]uint64, int64, error) {
 	if es.ESClient == nil {
 		return nil, 0, nil
 	}
 
 	mustArr := []interface{}{}
-
-	if req.Query != "" {
-		mustArr = append(mustArr, map[string]interface{}{
-			"query_string": map[string]interface{}{
-				"query": "*" + req.Query + "*",
-			},
-		})
-	}
 
 	v := reflect.ValueOf(req)
 	if v.Kind() == reflect.Ptr {
@@ -127,7 +119,7 @@ func Search(ctx context.Context, req *esCore.VehicleSearchQuery) ([]uint64, int6
 		queryMap["sort"] = []map[string]interface{}{
 			{
 				sortBy: map[string]interface{}{
-					"order": order,
+					"order":         order,
 					"unmapped_type": "long",
 				},
 			},
