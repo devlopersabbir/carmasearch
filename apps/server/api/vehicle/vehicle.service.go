@@ -26,6 +26,43 @@ func NewService(repo domain.Repository) domain.Service {
 	}
 }
 
+func (s *service) SearchAndCompare(
+	c context.Context,
+	req *esCore.VehicleSearchAndCompare,
+) (int64, []*core.Vehicle, error) {
+	ids, total, err := esRepo.Search(c, req)
+	if err != nil {
+		return 0, nil, err
+	}
+
+	if len(ids) == 0 {
+		return total, []*core.Vehicle{}, nil
+	}
+
+	vehicles, err := s.repo.FindByIDs(ids)
+	if err != nil {
+		return 0, nil, err
+	}
+
+	return total, vehicles, nil
+}
+
+// BulkSyncToElastic re-indexes every vehicle from PostgreSQL into Elasticsearch
+// using the configured batchSize (defaults to 1000 when ≤ 0).
+// It delegates all paging and indexing logic to elastic.SyncAllVehicles, keeping
+// the service layer thin and the logic reusable.
+func (s *service) BulkSyncToElastic(c context.Context, batchSize int) (int, error) {
+	fetcher := func(ctx context.Context, limit, offset int) ([]*core.Vehicle, error) {
+		return s.repo.FindPaginated(ctx, limit, offset)
+	}
+	return esRepo.SyncAllVehicles(c, fetcher, esRepo.SyncOptions{
+		BatchSize: batchSize,
+	})
+}
+
+func (s *service) GetVehicleByUrl(c context.Context, url string) (*core.Vehicle, error) {
+	return s.repo.FindByUrl(c, url)
+}
 func (s *service) CreateVehicle(c context.Context, vehicle *core.Vehicle) error {
 	if vehicle.Title == nil || *vehicle.Title == "" {
 		return errors.New("title is required")
@@ -81,38 +118,4 @@ func (s *service) ListVehicles(limit, offset int) ([]core.Vehicle, int64, error)
 		offset = 0
 	}
 	return s.repo.List(limit, offset)
-}
-
-func (s *service) SearchAndCompare(
-	c context.Context,
-	req *esCore.VehicleSearchAndCompare,
-) (int64, []*core.Vehicle, error) {
-	ids, total, err := esRepo.Search(c, req)
-	if err != nil {
-		return 0, nil, err
-	}
-
-	if len(ids) == 0 {
-		return total, []*core.Vehicle{}, nil
-	}
-
-	vehicles, err := s.repo.FindByIDs(ids)
-	if err != nil {
-		return 0, nil, err
-	}
-
-	return total, vehicles, nil
-}
-
-// BulkSyncToElastic re-indexes every vehicle from PostgreSQL into Elasticsearch
-// using the configured batchSize (defaults to 1000 when ≤ 0).
-// It delegates all paging and indexing logic to elastic.SyncAllVehicles, keeping
-// the service layer thin and the logic reusable.
-func (s *service) BulkSyncToElastic(c context.Context, batchSize int) (int, error) {
-	fetcher := func(ctx context.Context, limit, offset int) ([]*core.Vehicle, error) {
-		return s.repo.FindPaginated(ctx, limit, offset)
-	}
-	return esRepo.SyncAllVehicles(c, fetcher, esRepo.SyncOptions{
-		BatchSize: batchSize,
-	})
 }

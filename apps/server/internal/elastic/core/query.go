@@ -15,64 +15,85 @@ type CompareRequestQuery struct {
 }
 
 type VehicleSearchAndCompare struct {
-	// Basic vehicle Info
-	VehicleID    *string  `json:"vehicle_id"`
-	ListingURL   *string  `json:"listing_url"`
-	Title        *string  `json:"title"`
-	Make         *string  `json:"make"`
-	Model        *string  `json:"model"`
-	FuelType     []string `json:"fuel_type"`
-	Transmission []string `json:"transmission"`
-	SellerName   *string  `json:"seller_name"`
+	Url string `json:"url"`
+	// Basic vehicle Info (Search Query Parameters)
+	VehicleID    *string `json:"vehicle_id"`    // Vehicle ID to search a specific vehicle
+	ListingURL   *string `json:"listing_url"`   // Vehicle listing URL for searching
+	Title        *string `json:"title"`         // Vehicle title for search and comparison
+	Make         *string `json:"make"`          // Make of the vehicle
+	Model        *string `json:"model"`         // Model of the vehicle
+	MakeID       *string `json:"make_id"`       // ID of the make for filtering
+	ModelID      *string `json:"model_id"`      // ID of the model for filtering
+	ModelVersion *string `json:"model_version"` // Model version for searching specific versions
+	ModelRange   *string `json:"model_range"`   // Range of the model (like sedan, SUV, etc.)
+	TrimLine     *string `json:"trim_line"`     // Trim line for detailed filtering of vehicle variants
+	VehicleType  *string `json:"vehicle_type"`  // Type of vehicle (e.g., sedan, coupe)
 
-	// price & registration range
-	PriceFrom        *float64 `json:"price_from"`
-	PriceTo          *float64 `json:"price_to"`
-	RegistrationFrom *int     `json:"registration_from"`
-	RegistrationTo   *int     `json:"registration_to"`
-	MileageFrom      *int     `json:"mileage_from"`
-	MileageTo        *int     `json:"mileage_to"`
-	CO2EmissionFrom  *int     `json:"co2_emission_from"`
-	CO2EmissionTo    *int     `json:"co2_emission_to"`
+	// Pricing and Registration range
+	PriceFrom        *float64 `json:"price_from"`        // Minimum price to search for
+	PriceTo          *float64 `json:"price_to"`          // Maximum price to search for
+	RegistrationFrom *int     `json:"registration_from"` // Start year of registration
+	RegistrationTo   *int     `json:"registration_to"`   // End year of registration
 
-	// vehicle details
-	PreviousOwners    *int     `json:"previous_owners"`
-	Seats             *int     `json:"seats"`
-	Doors             *int     `json:"doors"`
-	ExteriorColors    []string `json:"exterior_colors"`
-	InteriorColors    []string `json:"interior_colors"`
-	InteriorMaterials []string `json:"interior_materials"`
+	// Mileage range
+	MileageFrom *int `json:"mileage_from"` // Minimum mileage for searching
+	MileageTo   *int `json:"mileage_to"`   // Maximum mileage for searching
 
-	// safty features
-	ABS                    *bool `json:"abs"`
-	ESP                    *bool `json:"esp"`
-	TractionControl        *bool `json:"traction_control"`
-	EmergencyBrakeAssist   *bool `json:"emergency_brake_assist"`
-	BlindSpotAssist        *bool `json:"blind_spot_assist"`
-	LaneAssist             *bool `json:"lane_assist"`
-	TrafficSignRecognition *bool `json:"traffic_sign_recognition"`
-	ISOFIX                 *bool `json:"isofix"`
+	// CO2 Emission range
+	CO2EmissionFrom *int `json:"co2_emission_from"` // Minimum CO2 emissions
+	CO2EmissionTo   *int `json:"co2_emission_to"`   // Maximum CO2 emissions
 
-	// comfort features
-	HeatedSteeringWheel *bool `json:"heated_steering_wheel"`
-	StartStopSystem     *bool `json:"start_stop_system"`
-	HeatedSeats         *bool `json:"heated_seats"`
-	ElectricSeats       *bool `json:"electric_seats"`
-	SportSeats          *bool `json:"sport_seats"`
+	// Fuel and Transmission Filters
+	FuelType     string  `json:"fuel_type"`    // List of fuel types (e.g., petrol, diesel, electric)
+	Transmission string  `json:"transmission"` // List of transmission types (e.g., manual, automatic)
+	DriveTrain   *string `json:"drive_train"`  // Drive train (e.g., FWD, RWD, AWD)
 
-	// Exterior Features
-	FogLights          *bool `json:"fog_lights"`
-	AdaptiveHeadlights *bool `json:"adaptive_headlights"`
-	RainSensor         *bool `json:"rain_sensor"`
+	// Vehicle Details for more detailed comparison
+	PreviousOwners    *string `json:"previous_owners"`    // Number of previous owners
+	Seats             *string `json:"seats"`              // Number of seats in the vehicle
+	Doors             *string `json:"doors"`              // Number of doors in the vehicle
+	ExteriorColors    *string `json:"exterior_colors"`    // List of possible exterior colors
+	InteriorColors    *string `json:"interior_colors"`    // List of possible interior colors
+	InteriorMaterials *string `json:"interior_materials"` // Materials used for interior (e.g., leather, fabric)
+
+	// Safety Features
+	ABS                    *bool `json:"abs"`                      // Whether the vehicle has ABS
+	ESP                    *bool `json:"esp"`                      // Whether the vehicle has ESP
+	TractionControl        *bool `json:"traction_control"`         // Whether the vehicle has traction control
+	EmergencyBrakeAssist   *bool `json:"emergency_brake_assist"`   // Emergency brake assist system
+	BlindSpotAssist        *bool `json:"blind_spot_assist"`        // Blind spot assist system
+	LaneAssist             *bool `json:"lane_assist"`              // Lane assist system
+	TrafficSignRecognition *bool `json:"traffic_sign_recognition"` // Traffic sign recognition system
+
+	// Comfort Features
+	HeatedSteeringWheel *bool `json:"heated_steering_wheel"` // Heated steering wheel
+	StartStopSystem     *bool `json:"start_stop_system"`     // Start/Stop system
+	HeatedSeats         *bool `json:"heated_seats"`          // Heated seats
+	ElectricSeats       *bool `json:"electric_seats"`        // Electric adjustable seats
+	SportSeats          *bool `json:"sport_seats"`           // Sport seats for more comfortable driving
+
+	// Exterior Features (For comparison)
+	FogLights          *bool `json:"fog_lights"`          // Whether the vehicle has fog lights
+	AdaptiveHeadlights *bool `json:"adaptive_headlights"` // Adaptive headlights for improved vision
+	RainSensor         *bool `json:"rain_sensor"`         // Rain sensor for automatic wiper activation
 
 	// Infotainment
-	Radio            *bool `json:"radio"`
-	NavigationSystem *bool `json:"navigation_system"`
-	VoiceControl     *bool `json:"voice_control"`
-	Bluetooth        *bool `json:"bluetooth"`
-	USB              *bool `json:"usb"`
-	AppleCarPlay     *bool `json:"apple_carplay"`
-	AndroidAuto      *bool `json:"android_auto"`
+	Radio            *bool `json:"radio"`             // Whether the vehicle has a radio
+	NavigationSystem *bool `json:"navigation_system"` // Navigation system
+	VoiceControl     *bool `json:"voice_control"`     // Voice control for vehicle commands
+	Bluetooth        *bool `json:"bluetooth"`         // Bluetooth connectivity
+	USB              *bool `json:"usb"`               // USB connectivity
+	AppleCarPlay     *bool `json:"apple_carplay"`     // Apple CarPlay integration
+	AndroidAuto      *bool `json:"android_auto"`      // Android Auto integration
+
+	// Location Information (for filtering searches by location)
+	CountryCode *string `json:"country_code"` // Country of the vehicle
+	City        *string `json:"city"`         // City where the vehicle is listed
+	PostalCode  *string `json:"postal_code"`  // Postal code of the vehicle's location
+	Street      *string `json:"street"`       // Street where the vehicle is located
+	SellerName  *string `json:"seller_name"`  // Seller name for the vehicle listing
+
+	// Additional Fields for more comparison capabilities
 	CompareRequestQuery
 }
 

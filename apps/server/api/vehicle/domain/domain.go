@@ -17,6 +17,7 @@ type Repository interface {
 	List(limit, offset int) ([]core.Vehicle, int64, error)
 	// FindPaginated is used by the bulk-sync loop to stream records in pages.
 	FindPaginated(c context.Context, limit, offset int) ([]*core.Vehicle, error)
+	FindByUrl(c context.Context, url string) (*core.Vehicle, error)
 }
 
 type Service interface {
@@ -25,6 +26,7 @@ type Service interface {
 	UpdateVehicle(vehicle *core.Vehicle) error
 	DeleteVehicle(id uint) error
 	ListVehicles(limit, offset int) ([]core.Vehicle, int64, error)
+	GetVehicleByUrl(c context.Context, url string) (*core.Vehicle, error)
 
 	SearchAndCompare(
 		c context.Context,

@@ -11,7 +11,6 @@ import (
 	"github.com/carmasearch/carma-server/arch/network"
 	esCore "github.com/carmasearch/carma-server/internal/elastic/core"
 	esDomain "github.com/carmasearch/carma-server/internal/elastic/domain"
-	"github.com/carmasearch/carma-server/internal/scraper"
 	"github.com/gin-gonic/gin"
 )
 
@@ -108,13 +107,14 @@ func (cn *vehicleController) search(c *gin.Context) {
 	if query.PageSize < 1 || query.PageSize > 100 {
 		query.PageSize = 20
 	}
-	// 1. Call Scraper using body.Url
-	jsonData, err := scraper.Scrape(body.Url)
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Hello World",
-	})
-	return
+	if body.Url == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Url is required"})
+		return
+	}
+	// 1. Call get vehicle by url using body.Url
+	jsonData, err := cn.service.GetVehicleByUrl(c.Request.Context(), body.Url)
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

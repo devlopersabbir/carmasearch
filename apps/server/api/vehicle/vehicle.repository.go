@@ -18,6 +18,14 @@ func NewRepository(db *gorm.DB) domain.Repository {
 	}
 }
 
+func (r *repository) FindByUrl(c context.Context, url string) (*core.Vehicle, error) {
+	var vehicle core.Vehicle
+	if err := r.db.WithContext(c).First(&vehicle, "listing_url = ?", url).Error; err != nil {
+		return nil, err
+	}
+	return &vehicle, nil
+}
+
 func (r *repository) Create(c context.Context, v *core.Vehicle) error {
 	return r.db.Create(v).Error
 }
