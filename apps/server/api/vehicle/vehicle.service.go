@@ -103,3 +103,16 @@ func (s *service) SearchAndCompare(
 
 	return total, vehicles, nil
 }
+
+// BulkSyncToElastic re-indexes every vehicle from PostgreSQL into Elasticsearch
+// using the configured batchSize (defaults to 1000 when ≤ 0).
+// It delegates all paging and indexing logic to elastic.SyncAllVehicles, keeping
+// the service layer thin and the logic reusable.
+func (s *service) BulkSyncToElastic(c context.Context, batchSize int) (int, error) {
+	fetcher := func(ctx context.Context, limit, offset int) ([]*core.Vehicle, error) {
+		return s.repo.FindPaginated(ctx, limit, offset)
+	}
+	return esRepo.SyncAllVehicles(c, fetcher, esRepo.SyncOptions{
+		BatchSize: batchSize,
+	})
+}

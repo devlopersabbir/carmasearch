@@ -80,3 +80,17 @@ func (r *repository) List(limit, offset int) ([]core.Vehicle, int64, error) {
 
 	return vehicles, count, nil
 }
+
+// FindPaginated fetches a page of vehicles without a COUNT query —
+// intended for the bulk-sync loop where total count is not needed.
+func (r *repository) FindPaginated(c context.Context, limit, offset int) ([]*core.Vehicle, error) {
+	var vehicles []*core.Vehicle
+	if err := r.db.WithContext(c).
+		Order("id ASC").
+		Limit(limit).
+		Offset(offset).
+		Find(&vehicles).Error; err != nil {
+		return nil, err
+	}
+	return vehicles, nil
+}

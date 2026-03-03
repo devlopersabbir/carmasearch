@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/carmasearch/carma-server/api/vehicle/core"
 	"github.com/carmasearch/carma-server/api/vehicle/domain"
@@ -150,6 +151,32 @@ func (cn *vehicleController) search2(c *gin.Context) {
 
 }
 
+// sync triggers a full bulk re-index of all PostgreSQL vehicles into Elasticsearch.
+// POST /api/v1/vehicles/sync?batch_size=1000
+func (cn *vehicleController) sync(c *gin.Context) {
+	batchSize := 1000
+	if bs := c.Query("batch_size"); bs != "" {
+		if v, err := strconv.Atoi(bs); err == nil && v > 0 {
+			batchSize = v
+		}
+	}
+
+	start := time.Now()
+	total, err := cn.service.BulkSyncToElastic(c.Request.Context(), batchSize)
+	if err != nil {
+		log.Printf("bulk sync failed: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":     "ok",
+		"synced":     total,
+		"batch_size": batchSize,
+		"duration":   time.Since(start).String(),
+	})
+}
+
 func (cn *vehicleController) MountRoutes(group *gin.RouterGroup) {
 	v1 := group.Group("/v1/vehicles")
 	{
@@ -157,6 +184,7 @@ func (cn *vehicleController) MountRoutes(group *gin.RouterGroup) {
 		v1.GET("/:id", cn.get)
 		v1.GET("", cn.list)
 		v1.POST("/search", cn.search)
+		v1.POST("/sync", cn.sync)
 	}
 	v2 := group.Group("/v2/vehicles")
 	{

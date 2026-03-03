@@ -15,6 +15,8 @@ type Repository interface {
 	Update(vehicle *core.Vehicle) error
 	Delete(id uint) error
 	List(limit, offset int) ([]core.Vehicle, int64, error)
+	// FindPaginated is used by the bulk-sync loop to stream records in pages.
+	FindPaginated(c context.Context, limit, offset int) ([]*core.Vehicle, error)
 }
 
 type Service interface {
@@ -28,4 +30,8 @@ type Service interface {
 		c context.Context,
 		req *esCore.VehicleSearchAndCompare,
 	) (int64, []*core.Vehicle, error)
+
+	// BulkSyncToElastic re-indexes all PostgreSQL vehicles into Elasticsearch
+	// in batches. Returns the total number indexed.
+	BulkSyncToElastic(c context.Context, batchSize int) (int, error)
 }
