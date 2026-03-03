@@ -27,11 +27,11 @@ func NewService(repo domain.Repository) domain.Service {
 }
 
 func (s *service) CreateVehicle(c context.Context, vehicle *core.Vehicle) error {
-	if vehicle.Title == "" {
+	if vehicle.Title == nil || *vehicle.Title == "" {
 		return errors.New("title is required")
 	}
 	// generate slug
-	slug := utils.Slugify(vehicle.Title, utils.Options{
+	slug := utils.Slugify(*vehicle.Title, utils.Options{
 		Replacement: "-",
 		Strict:      false,
 		Lower:       true,
@@ -42,7 +42,7 @@ func (s *service) CreateVehicle(c context.Context, vehicle *core.Vehicle) error 
 		return errors.New("Vehicle already exits with this title")
 	}
 
-	vehicle.Slug = slug
+	vehicle.Slug = &slug
 	e := s.repo.Create(c, vehicle)
 	if e != nil {
 		return e
@@ -87,7 +87,6 @@ func (s *service) SearchAndCompare(
 	c context.Context,
 	req *esCore.VehicleSearchAndCompare,
 ) (int64, []*core.Vehicle, error) {
-
 	ids, total, err := esRepo.Search(c, req)
 	if err != nil {
 		return 0, nil, err

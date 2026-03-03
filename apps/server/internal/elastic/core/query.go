@@ -4,6 +4,7 @@ import "github.com/carmasearch/carma-server/api/vehicle/core"
 
 type CompareRequest struct {
 	Url string `json:"url"`
+	VehicleSearchAndCompare
 }
 
 type CompareRequestQuery struct {

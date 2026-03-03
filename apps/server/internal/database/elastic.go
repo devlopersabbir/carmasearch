@@ -42,7 +42,6 @@ func ESCreateIndexIfNotExist() {
 
 	defer res.Body.Close()
 
-	log.Printf("Status code::::::::::%d", res.StatusCode)
 	if res.StatusCode == 400 {
 		log.Println("Index already created, skip now.")
 		return

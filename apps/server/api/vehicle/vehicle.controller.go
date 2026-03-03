@@ -1,6 +1,7 @@
 package vehicle
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 
@@ -106,15 +107,20 @@ func (cn *vehicleController) search(c *gin.Context) {
 	if query.PageSize < 1 || query.PageSize > 100 {
 		query.PageSize = 20
 	}
-
 	// 1. Call Scraper using body.Url
-	if err := scraper.Scrape(body.Url); err != nil {
+	jsonData, err := scraper.Scrape(body.Url)
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Hello World",
+	})
+	return
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+	log.Println("jsonData::::::::::", jsonData)
 	// 2. Build VehicleSearchAndCompare
 	searchAndQuery := buildVehicleSearchAndCompare(&body, &query)
-
 	// 3. Call service
 	total, vehicles, err := cn.service.SearchAndCompare(
 		c.Request.Context(),

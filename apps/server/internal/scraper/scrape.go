@@ -7,29 +7,27 @@ import (
 	"github.com/gocolly/colly/v2/debug"
 )
 
-func Scrape(url string) error {
+func Scrape(url string) (interface{}, error) {
 	if url == "" {
-		return nil
+		return nil, nil
 	}
 
 	c := colly.NewCollector(
 		colly.Debugger(&debug.LogDebugger{}),
 	)
 
-	c.OnHTML("a", HandleScrape)
-
-	c.OnRequest(func(r *colly.Request) {
-		fmt.Println("Visiting...", r.URL)
+	c.OnHTML("h2", func(e *colly.HTMLElement) {
+		fmt.Println("Title:::::::::::", e.Text)
 	})
-
 	c.OnError(func(r *colly.Response, err error) {
-		fmt.Println("Request URL:", r.Request.URL, "failed with response:", r, "\nError:", err)
+		fmt.Println("Fail to scrape data")
 	})
 
 	err := c.Visit(url)
+
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return nil, nil
 }

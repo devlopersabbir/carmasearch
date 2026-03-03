@@ -23,7 +23,7 @@ func LoadEnv(path string) (*Config, error) {
 		},
 		Database: DatabaseConfig{
 			Host:            GetEnv("DB_HOST", "localhost"),
-			Port:            GetEnv("DB_PORT", "5431"),
+			Port:            GetEnv("DB_PORT", "5432"),
 			User:            GetEnv("DB_USER", "carma_user"),
 			Password:        GetEnv("DB_PASSWORD", "carma0912pass"),
 			DBName:          GetEnv("DB_NAME", "carma_db"),

@@ -25,9 +25,6 @@ type module struct {
 	HealthService         health.Service
 	VehicleService        vehicleDomain.Service
 	VehicleCompareService esDomain.VehicleCompareService
-	// List of service is here
-	// UserService
-	// AuthService and rest...
 }
 
 func (m *module) GetInstance() *module {
