@@ -1,3 +1,5 @@
+import { ResponseVehicleData } from "@/@types";
+
 export type AdvanceOptionState = {
   vehicleUrl: string;
   setVehicleUrl: (vehicleUrl: string) => void;
@@ -37,8 +39,10 @@ export type AdvanceOptionState = {
 
   // handle save and compare function
   handleSaveAndCompare: () => void;
-  setSearchResults: <T>(searchResults: T | null) => void;
-  searchResults: any;
+  setSearchResults: <T extends ResponseVehicleData>(
+    searchResults: T | null,
+  ) => void;
+  searchResults: ResponseVehicleData | null;
   error: string;
   setError: (error: string) => void;
 };

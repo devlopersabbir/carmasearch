@@ -12,7 +12,7 @@ export default function CtaButtons() {
       <Button
         size="lg"
         onClick={() => {
-          handleCompareClick();
+          handleCompareClick;
           setIsCompareModalOpen(true);
         }}
         className="text-lg px-8 py-3"

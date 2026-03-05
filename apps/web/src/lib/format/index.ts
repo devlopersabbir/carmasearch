@@ -44,18 +44,18 @@ export function formatDealScore(rawScore?: number | null): {
   };
 }
 
-export function formatPrice(price?: number | null): string {
+export function formatPrice<T>(price?: T): string {
   if (price === null || price === undefined || Number.isNaN(price)) {
     return "N/A";
   }
 
-  return currencyFormatter.format(price);
+  return currencyFormatter.format(price as number);
 }
 
 // Format mileage for display
-export function formatMileage(mileage: number): string {
+export function formatMileage<T>(mileage: T): string {
   if (mileage === null || mileage === undefined || Number.isNaN(mileage)) {
     return "N/A";
   }
-  return `${mileageFormatter.format(mileage)} km`;
+  return `${mileageFormatter.format(mileage as number)} km`;
 }

@@ -50,17 +50,20 @@ export const useAdvanceOptionStore = create<AdvanceOptionState>((set, get) => ({
     // TODO: call api to get data
     const query = get();
     try {
-      const res = await CompareVehicles({ ...query });
-
-      console.log("res: ", res);
+      const response = await CompareVehicles({
+        listing_url: query.vehicleUrl,
+      });
+      console.log(response);
+      if (response) {
+        set({ searchResults: response });
+      }
     } catch (err) {
-      console.log(err);
+      set({ error: err as string });
     } finally {
       set({ isSearching: false });
     }
   },
-  setSearchResults: <T>(searchResults: T) => {
-    console.log(searchResults);
+  setSearchResults: (searchResults) => {
     set({ searchResults });
   },
   searchResults: null,
