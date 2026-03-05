@@ -38,3 +38,4 @@ __debug*
 build
 .env
 .env.production
+go.sum
