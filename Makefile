@@ -26,5 +26,8 @@ web-%:
 server-%:
 	$(MAKE) -C apps/server $*
 
+in-%:
+	$(MAKE) -C apps/intelligence $*
+
 scraper-%:
 	$(MAKE) -C apps/scraper $*

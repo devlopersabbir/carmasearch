@@ -116,20 +116,64 @@ services:
       - carmasearch
     restart: unless-stopped
 
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.5.2
-    container_name: elasticsearch
+  elasticsearch1:
+    image: elasticsearch:9.3.1
+    container_name: elasticsearch1
     environment:
       - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - ELASTIC_USERNAME=${ES_USERNAME:-elastic}
+      - ELASTIC_PASSWORD=${ES_PASSWORD:-elastic}
+    profiles:
+      - dev
+      - prod
+      - elasticsearch1
+    ports:
+      - "9201:9200"
+    volumes:
+      - elasticsearch1:/usr/share/elasticsearch/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -fs http://localhost:9201/_cluster/health?wait_for_status=yellow&timeout=1s || exit 1",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - carmasearch
+  elasticsearch2:
+    image: elasticsearch:9.3.1
+    container_name: elasticsearch2
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - ELASTIC_USERNAME=${ES_USERNAME:-elastic}
+      - ELASTIC_PASSWORD=${ES_PASSWORD:-elastic}
     profiles:
       - dev
       - prod
       - elasticsearch
+    ports:
+      - "9202:9200"
     volumes:
-      - elasticsearch:/usr/share/elasticsearch/data
+      - elasticsearch2:/usr/share/elasticsearch/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -fs http://localhost:9202/_cluster/health?wait_for_status=yellow&timeout=1s || exit 1",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+    restart: unless-stopped
     networks:
       - carmasearch
-    restart: unless-stopped
 
 networks:
   carmasearch:
@@ -138,5 +182,7 @@ networks:
 volumes:
   postgres_data:
     driver: local
-  elasticsearch:
+  elasticsearch1:
+    driver: local
+  elasticsearch2:
     driver: local

@@ -103,7 +103,7 @@ services:
       - carmasearch
 
   elasticsearch1:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.5.2
+    image: elasticsearch:9.3.1
     container_name: elasticsearch1
     environment:
       - discovery.type=single-node
@@ -113,16 +113,16 @@ services:
     profiles:
       - dev
       - prod
-      - elasticsearch
+      - elasticsearch1
     ports:
-      - "9200:9200"
+      - "9201:9200"
     volumes:
-      - elasticsearch:/usr/share/elasticsearch/data
+      - elasticsearch1:/usr/share/elasticsearch/data
     healthcheck:
       test:
         [
           "CMD-SHELL",
-          "curl -fs http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=1s || exit 1",
+          "curl -fs http://localhost:9201/_cluster/health?wait_for_status=yellow&timeout=1s || exit 1",
         ]
       interval: 10s
       timeout: 5s
@@ -132,7 +132,7 @@ services:
     networks:
       - carmasearch
   elasticsearch2:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.5.2
+    image: elasticsearch:9.3.1
     container_name: elasticsearch2
     environment:
       - discovery.type=single-node
@@ -144,14 +144,14 @@ services:
       - prod
       - elasticsearch
     ports:
-      - "9201:9200"
+      - "9202:9200"
     volumes:
-      - elasticsearch1:/usr/share/elasticsearch/data
+      - elasticsearch2:/usr/share/elasticsearch/data
     healthcheck:
       test:
         [
           "CMD-SHELL",
-          "curl -fs http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=1s || exit 1",
+          "curl -fs http://localhost:9202/_cluster/health?wait_for_status=yellow&timeout=1s || exit 1",
         ]
       interval: 10s
       timeout: 5s
@@ -168,7 +168,7 @@ networks:
 volumes:
   postgres_data:
     driver: local
-  elasticsearch:
-    driver: local
   elasticsearch1:
+    driver: local
+  elasticsearch2:
     driver: local
