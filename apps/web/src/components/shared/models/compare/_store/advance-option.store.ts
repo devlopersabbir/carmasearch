@@ -53,7 +53,6 @@ export const useAdvanceOptionStore = create<AdvanceOptionState>((set, get) => ({
       const response = await CompareVehicles({
         listing_url: query.vehicleUrl,
       });
-      console.log(response);
       if (response) {
         set({ searchResults: response });
       }

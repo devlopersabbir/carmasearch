@@ -1,4 +1,4 @@
-.PHONY: web server scraper infrastructure
+.PHONY: Carmasearch infrastructure
 
 # ---------- Infra ----------
 docker-build:

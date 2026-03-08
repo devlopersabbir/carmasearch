@@ -6,6 +6,10 @@ export type CtaButtonsStore = {
 };
 
 export const ctaButtonsStore = create<CtaButtonsStore>((set) => ({
-  handleCompareClick: () => set({}),
-  handlePriceAlertsClick: () => set({}),
+  handleCompareClick: () => {
+    console.log("Compare clicked");
+  },
+  handlePriceAlertsClick: () => {
+    console.log("Price alerts clicked");
+  },
 }));

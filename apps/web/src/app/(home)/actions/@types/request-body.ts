@@ -1,13 +1,18 @@
-export type CompareVehiclesRequestBody = {
-  listing_url: string;
-  page?: number;
-  page_size?: number;
-  // for the advance search
-  registration_from?: string;
-  registration_until?: string;
-  mileage_from?: string;
-  mileage_until?: string;
-  exterior_colors?: string[];
-  interior_colors?: string[];
-  interior_materials?: string[];
-};
+import { z } from "zod";
+
+export const compareVehiclesRequestBody = z.object({
+  listing_url: z.string(),
+  page: z.number().optional(),
+  page_size: z.number().optional(),
+  registration_from: z.string().optional(),
+  registration_until: z.string().optional(),
+  mileage_from: z.string().optional(),
+  mileage_until: z.string().optional(),
+  exterior_colors: z.array(z.string()).optional(),
+  interior_colors: z.array(z.string()).optional(),
+  interior_materials: z.array(z.string()).optional(),
+});
+
+export type CompareVehiclesRequestBody = z.infer<
+  typeof compareVehiclesRequestBody
+>;

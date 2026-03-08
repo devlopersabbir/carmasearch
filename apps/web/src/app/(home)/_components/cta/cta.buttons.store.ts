@@ -11,12 +11,16 @@ export const useCtaButtonsStore = create<CtaButtonsStore>((set) => ({
     const query = useAdvanceOptionStore();
     try {
       const res = await CompareVehicles({
+        listing_url: query.vehicleUrl,
         ...query,
       });
-
-      console.log("res: ", res);
+      if (res) {
+        query.setSearchResults(res);
+      }
     } catch (err) {
-      console.log(err);
+      query.setError(err as string);
+    } finally {
+      query.setIsSearching(false);
     }
   },
 }));

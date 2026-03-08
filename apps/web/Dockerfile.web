@@ -1,48 +1,91 @@
-# Stage 1: Dependencies
-FROM node:20-alpine AS deps
-RUN apk add --no-cache libc6-compat
+############################################
+# Stage 1 — Base Bun image for building
+############################################
+FROM oven/bun:1.1.29-alpine AS bun-base
+
+# Set working directory
 WORKDIR /app
 
-# Copy package files
-COPY package.json package-lock.json* ./
-RUN npm ci
 
-# Stage 2: Builder
-FROM node:20-alpine AS builder
+############################################
+# Stage 2 — Install dependencies
+# Only re-run when package.json or bun.lock changes
+############################################
+FROM bun-base AS deps
+
+# Copy dependency manifest files
+COPY package.json bun.lock ./
+
+# Install dependencies using Bun
+# --frozen-lockfile ensures deterministic builds
+RUN bun install --frozen-lockfile
+
+
+############################################
+# Stage 3 — Build Next.js project
+############################################
+FROM bun-base AS builder
+
 WORKDIR /app
 
-# Copy dependencies from deps stage
+# Copy installed node_modules from deps layer
 COPY --from=deps /app/node_modules ./node_modules
+
+# Copy project source
 COPY . .
 
-# Disable telemetry during build
+# Disable Next telemetry in CI/CD
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Build the application
-RUN npm run build
+# Build Next.js project
+RUN bun run build
 
-# Stage 3: Runner
+
+############################################
+# Stage 4 — Production runtime (Node.js)
+############################################
 FROM node:20-alpine AS runner
+
 WORKDIR /app
 
+# Set production environment
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Create a non-root user
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+############################################
+# Create non-root user (security best practice)
+############################################
+RUN addgroup -S nodejs \
+  && adduser -S nextjs -G nodejs -u 1001
 
-# Copy necessary files
-COPY --from=builder /app/public ./public
+############################################
+# Copy standalone build output
+############################################
+
+# Next standalone server
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+
+# Static assets
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
+# Public files
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+
+
+############################################
+# Use non-root user
+############################################
 USER nextjs
 
+############################################
+# Expose application port
+############################################
 EXPOSE 3000
 
 ENV PORT=3000
-ENV HOSTNAME="0.0.0.0"
+ENV HOSTNAME=0.0.0.0
 
+############################################
+# Start Next.js standalone server
+############################################
 CMD ["node", "server.js"]
-
