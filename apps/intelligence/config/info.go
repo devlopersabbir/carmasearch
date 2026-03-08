@@ -9,5 +9,7 @@ type Config struct {
 	DBSSLMode         string
 	ElasticsearchUrl  string
 	ElasticsearchUrls string // comma-separated list for multiple nodes
+	ElasticUsername   string
+	ElasticPassword   string
 	ServerPort        string
 }

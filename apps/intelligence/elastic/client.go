@@ -16,20 +16,18 @@ var EsClient *elasticsearch.Client
 func ElasticClient(cfg *config.Config) {
 	es, err := elasticsearch.NewClient(elasticsearch.Config{
 		Addresses: cfg.ElasticAddresses(),
+		Username:  cfg.ElasticUsername,
+		Password:  cfg.ElasticPassword,
 	})
+
 	if err != nil {
 		log.Fatalf("failed to connect to elasticsearch: %v", err)
 	}
-
-	info, err := es.Info()
+	res, err := es.Info()
 	if err != nil {
-		log.Fatalf("elasticsearch info call failed: %v", err)
+		log.Fatalf("failed to get elasticsearch info: %v", err)
 	}
-	defer info.Body.Close()
-	if info.IsError() {
-		log.Fatalf("elasticsearch info error: %s", info.String())
-	}
-	log.Println("Elasticsearch connection OK:", strings.TrimRight(info.String(), "\n"))
+	log.Println("Elasticsearch connection OK:", strings.TrimRight(res.String(), "\n"))
 
 	EsClient = es
 	createVehicleIndex(es)
