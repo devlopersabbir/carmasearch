@@ -193,7 +193,7 @@ func createVehicleIndex(es *elasticsearch.Client) {
 	defer res.Body.Close()
 
 	if res.IsError() {
-		log.Printf("create vehicles index error: %s", res.String())
+		log.Printf("create vehicles index error")
 	} else {
 		log.Println("Elasticsearch index 'vehicles' created successfully")
 	}

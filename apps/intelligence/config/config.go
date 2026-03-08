@@ -22,7 +22,7 @@ func LoadEnv() *Config {
 		ElasticsearchUrls: GetEnv("ELASTICSEARCH_URLS", "http://localhost:9201,http://localhost:9202"), // optional extra nodes
 		ElasticUsername:   GetEnv("ELASTICSEARCH_USERNAME", "elastic"),
 		ElasticPassword:   GetEnv("ELASTICSEARCH_PASSWORD", "elastic"),
-		ServerPort:        GetEnv("SERVER_PORT", "8080"),
+		ServerPort:        GetEnv("SERVER_PORT", "8083"),
 	}
 }
 
