@@ -31,8 +31,8 @@ services:
       - CORS_ALLOWED_HEADERS=Accept,Authorization,Content-Type,X-Request-ID
       - CORS_ALLOWED_METHODS=GET,POST,PUT,PATCH,DELETE,OPTIONS
     build:
-      context: ../../apps/server
-      dockerfile: Dockerfile.server
+      context: ../../apps/intelligence
+      dockerfile: Dockerfile.intelligence
     ports:
       - "8080:8080"
     networks:
