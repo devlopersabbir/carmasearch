@@ -82,8 +82,6 @@ services:
     image: postgres:16-alpine
     container_name: carma_db
     profiles:
-      - dev
-      - prod
       - db
     environment:
       POSTGRES_USER: ${DB_USER:-carma_user}
@@ -109,8 +107,6 @@ services:
     image: redis:alpine
     container_name: redis
     profiles:
-      - dev
-      - prod
       - redis
     networks:
       - carmasearch

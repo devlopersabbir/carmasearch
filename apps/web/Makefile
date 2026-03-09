@@ -1,6 +1,6 @@
 APP_NAME=carmasearch-web
 PORT=3000
-PACKAGE_MANAGER=pnpm
+PACKAGE_MANAGER=bun
 
 .PHONY: help install dev build start lint format clean docker-build docker-run
 

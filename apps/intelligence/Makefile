@@ -1,5 +1,5 @@
 mod:
-	go mod tidy
+	go mod download && go mod tidy
 
 dev:
 	air
