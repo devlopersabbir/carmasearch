@@ -53,6 +53,9 @@ func main() {
 		}
 	}
 
+	// Trigger auto-sync on startup
+	vehicleHandler.RunBackgroundSync()
+
 	log.Printf("Vehicle Search Server starting on port %s", cfg.ServerPort)
 	if err := r.Run(":" + cfg.ServerPort); err != nil {
 		log.Fatalf("failed to start server: %v", err)

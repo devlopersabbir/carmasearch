@@ -5,7 +5,7 @@ import {
   CompareVehiclesRequestBody,
 } from "./@types/request-body";
 
-const Baseurl = "http://localhost:8080/api/v1";
+const Baseurl = "http://localhost:8083/api/v1";
 export async function CompareVehicles<T extends CompareVehiclesRequestBody>(
   query: T,
 ) {

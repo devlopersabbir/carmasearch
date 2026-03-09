@@ -489,6 +489,13 @@ func (Vehicle) TableName() string {
 	return "vehicle_marketplace.vehicle_data"
 }
 
+// ScoredVehicle pairs a Vehicle document with the raw Elasticsearch
+// relevance score returned by a similarity search.
+type ScoredVehicle struct {
+	Vehicle Vehicle
+	ESScore float64
+}
+
 // ---------- Search Request / Response ----------
 
 type VehicleSearchRequest struct {
@@ -497,12 +504,54 @@ type VehicleSearchRequest struct {
 	PageSize   int    `json:"page_size,omitempty"`
 }
 
+// VehicleSearchResponse is kept for backward-compatibility (used internally).
 type VehicleSearchResponse struct {
 	Total        int64     `json:"total"`
 	Page         int       `json:"page"`
 	PageSize     int       `json:"page_size"`
 	QueryVehicle *Vehicle  `json:"query_vehicle"`
 	Results      []Vehicle `json:"results"`
+}
+
+// ---------- Ranking / Enriched Response ----------
+
+// ScoreBreakdown holds the individual component scores that contributed to
+// a vehicle's final ranking score.
+type ScoreBreakdown struct {
+	PriceScore      float64 `json:"price_score"`
+	MileageScore    float64 `json:"mileage_score"`
+	YearScore       float64 `json:"year_score"`
+	SimilarityScore float64 `json:"similarity_score"`
+	PopularityScore float64 `json:"popularity_score"`
+}
+
+// PricePrediction contains market intelligence about the vehicle's price.
+type PricePrediction struct {
+	PredictedFairPrice float64 `json:"predicted_fair_price"`
+	ListingPrice       float64 `json:"listing_price"`
+	// PriceDelta is (listing - predicted). Negative = good deal, Positive = above market.
+	PriceDelta  float64 `json:"price_delta"`
+	DealQuality string  `json:"deal_quality"` // "great", "fair", "overpriced"
+}
+
+// RankedVehicleResult wraps a Vehicle document with its ranking metadata.
+type RankedVehicleResult struct {
+	Rank            int             `json:"rank"`
+	FinalScore      float64         `json:"final_score"`
+	ScoreBreakdown  ScoreBreakdown  `json:"score_breakdown"`
+	PricePrediction PricePrediction `json:"price_prediction"`
+	Vehicle         Vehicle         `json:"vehicle"`
+}
+
+// EnrichedSearchResponse is the enriched API response that includes ranking
+// metadata, price prediction, and per-vehicle scoring.
+type EnrichedSearchResponse struct {
+	Total          int64                 `json:"total"`
+	Page           int                   `json:"page"`
+	PageSize       int                   `json:"page_size"`
+	MarketAvgPrice float64               `json:"market_avg_price"`
+	QueryVehicle   *Vehicle              `json:"query_vehicle"`
+	Results        []RankedVehicleResult `json:"results"`
 }
 
 // ---------- Indexing Trigger ----------

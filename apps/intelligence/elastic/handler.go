@@ -192,7 +192,7 @@ func GetVehicleByListingURL(ctx context.Context, listingURL string) (*models.Veh
 // SearchSimilarVehicles returns the best matching vehicles for a given reference vehicle
 // using a weighted bool query across make, model, mileage range, fuel type, transmission,
 // color, body type, year, and optional feature flags.
-func SearchSimilarVehicles(ctx context.Context, ref *models.Vehicle, page, pageSize int) ([]models.Vehicle, int64, error) {
+func SearchSimilarVehicles(ctx context.Context, ref *models.Vehicle, page, pageSize int) ([]models.ScoredVehicle, int64, error) {
 	if EsClient == nil {
 		return nil, 0, fmt.Errorf("elasticsearch client is not initialised")
 	}
@@ -461,7 +461,7 @@ func SearchSimilarVehicles(ctx context.Context, ref *models.Vehicle, page, pageS
 		}
 	}
 
-	vehicles := make([]models.Vehicle, 0, len(hits))
+	scored := make([]models.ScoredVehicle, 0, len(hits))
 	for _, hit := range hits {
 		hitMap, _ := hit.(map[string]interface{})
 		source, _ := hitMap["_source"].(map[string]interface{})
@@ -473,8 +473,9 @@ func SearchSimilarVehicles(ctx context.Context, ref *models.Vehicle, page, pageS
 		if err := json.Unmarshal(srcBytes, &v); err != nil {
 			continue
 		}
-		vehicles = append(vehicles, v)
+		esScore, _ := hitMap["_score"].(float64)
+		scored = append(scored, models.ScoredVehicle{Vehicle: v, ESScore: esScore})
 	}
 
-	return vehicles, total, nil
+	return scored, total, nil
 }
