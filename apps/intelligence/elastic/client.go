@@ -21,11 +21,11 @@ func ElasticClient(cfg *config.Config) {
 	})
 
 	if err != nil {
-		log.Fatalf("failed to connect to elasticsearch: %v", err)
+		log.Fatalf("failed to connect to elasticsearch")
 	}
 	res, err := es.Info()
 	if err != nil {
-		log.Fatalf("failed to get elasticsearch info: %v", err)
+		log.Fatalf("failed to get elasticsearch info")
 	}
 	log.Println("Elasticsearch connection OK:", strings.TrimRight(res.String(), "\n"))
 

@@ -93,8 +93,6 @@ services:
     image: redis:alpine
     container_name: redis
     profiles:
-      - dev
-      - prod
       - redis
     ports:
       - "6379:6379"
@@ -107,6 +105,7 @@ services:
     container_name: elasticsearch1
     environment:
       - discovery.type=single-node
+      - xpack.security.enabled=false
       - ES_JAVA_OPTS=-Xms512m -Xmx512m
       - ELASTIC_USERNAME=${ES_USERNAME:-elastic}
       - ELASTIC_PASSWORD=${ES_PASSWORD:-elastic}
@@ -137,6 +136,7 @@ services:
     environment:
       - discovery.type=single-node
       - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - xpack.security.enabled=false
       - ELASTIC_USERNAME=${ES_USERNAME:-elastic}
       - ELASTIC_PASSWORD=${ES_PASSWORD:-elastic}
     profiles:
